@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "Galeria Seleta",
+    "slug": "galeria-seleta",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": { "backgroundColor": "#0F0F0F" },
+    "assetBundlePatterns": ["assets/*"],
+    "android": { "package": "com.galeriaseleta.mobile" },
+    "ios": { "bundleIdentifier": "com.galeriaseleta.mobile" }
+  }
+}

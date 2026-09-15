@@ -1,0 +1,14 @@
+import React from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import { Screen } from '../components/Screen';
+import { Footer } from '../components/Footer';
+import { ABOUT_CARDS } from '../data';
+import { theme } from '../theme';
+const extra=[
+ ['Curadoria Exclusiva','Nosso objetivo é facilitar sua jornada de compra, oferecendo curadoria especial de produtos e a mesma essência acolhedora do brechó, agora ao alcance de um clique.'],
+ ['Peças Únicas','De grifes vintage a achados fast fashion em excelente estado, garantimos que você encontre sempre algo único e especial. Nossas coleções mudam constantemente, então o que é tendência hoje, pode ser seu amanhã.'],
+ ['Higienização','Mantivemos a alma do nosso brechó físico, mas com a praticidade do mundo moderno. Cada peça é selecionada a dedo, inspecionada, higienizada e catalogada com o mesmo olhar atento que nos tornou conhecidos.'],
+ ['Trocas e Suporte','Transformar o atendimento em uma jornada de confiança é o verdadeiro coração da sua marca. O foco é entregar tranquilidade e parceria constante. É essa dedicação em cada etapa que transforma compradores em fãs fiéis!'],
+];
+export function AboutScreen(){return <Screen><View style={styles.page}><View style={styles.header}><Text style={styles.title}>Como funciona a</Text><Text style={[styles.title,styles.italic]}>Galeria Seleta</Text><Text style={styles.intro}>Trabalhamos com peças vintage e exclusivas, selecionadas individualmente para garantir autenticidade, qualidade e estilo.</Text><Text style={styles.intro}>A Galeria Seleta nasceu em 2025 com o propósito de transformar a experiência de quem ama o universo dos brechós. Identificamos a oportunidade de unir estilo, sustentabilidade e praticidade em um só lugar, criando este espaço online para que você possa garimpar peças únicas sem precisar se deslocar até nossa loja física.</Text></View><View style={styles.grid}>{ABOUT_CARDS.map((c,i)=><View key={c.title} style={styles.card}><Image source={{uri:c.image}} style={styles.image}/><View style={styles.cardBody}><Text style={styles.cardTitle}>{c.title}</Text><Text style={styles.cardText}>{c.text}</Text><Text style={styles.cardText}>{extra[i][1]}</Text></View></View>)}</View></View><Footer/></Screen>}
+const styles=StyleSheet.create({page:{paddingHorizontal:16,paddingTop:28},header:{alignItems:'center'},title:{color:theme.colors.text,fontFamily:theme.fonts.display,fontSize:39,lineHeight:39,textAlign:'center'},italic:{fontStyle:'italic'},intro:{color:theme.colors.muted,fontSize:12,lineHeight:19,textAlign:'center',marginTop:15},grid:{gap:12,marginTop:28},card:{borderWidth:1,borderColor:theme.colors.line,backgroundColor:theme.colors.bg},image:{width:'100%',height:170,backgroundColor:theme.colors.surface2},cardBody:{padding:16},cardTitle:{color:theme.colors.text,fontFamily:theme.fonts.display,fontSize:25},cardText:{color:theme.colors.muted,fontSize:11,lineHeight:18,marginTop:9}});

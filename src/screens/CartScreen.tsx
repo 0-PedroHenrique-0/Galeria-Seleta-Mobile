@@ -1,0 +1,31 @@
+import React, { useEffect, useState } from 'react';
+import { Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Screen } from '../components/Screen';
+import { Header } from '../components/Header';
+import { Button } from '../components/Button';
+import { CartItem } from '../types';
+import { getCart, saveCart } from '../storage';
+import { theme } from '../theme';
+const money=(v:number)=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+export function CartScreen({navigation}:any){
+ const [items,setItems]=useState<CartItem[]>([]); const [coupon,setCoupon]=useState(''); const [applied,setApplied]=useState(false);
+ const refresh=async()=>setItems(await getCart()); useEffect(()=>{refresh(); const u=navigation.addListener('focus',refresh); return u;},[navigation]);
+ const subtotal=items.reduce((s,i)=>s+(i.discountPrice??i.price)*i.quantity,0); const discount=applied?subtotal*.1:0; const total=subtotal-discount;
+ async function update(next:CartItem[]){setItems(next);await saveCart(next)}
+ const change=(id:number,size:string|undefined,d:number)=>update(items.map(i=>i.id===id&&i.size===size?{...i,quantity:Math.max(1,Math.min(20,i.quantity+d))}:i));
+ const remove=(id:number,size:string|undefined)=>update(items.filter(i=>!(i.id===id&&i.size===size)));
+ return <Screen><Header navigation={navigation} onSearch={()=>navigation.navigate('Search')}/><View style={styles.page}>
+  <Text style={styles.title}>Sacola de compras</Text>
+  {items.length===0?<View style={styles.empty}><Ionicons name="bag-handle-outline" size={42} color={theme.colors.accent}/><Text style={styles.emptyTitle}>Sua sacola está vazia</Text><Text style={styles.emptyText}>Adicione peças selecionadas para começar sua experiência.</Text><View style={styles.full}><Button label="VER PRODUTOS" onPress={()=>navigation.navigate('Main',{screen:'Produtos'})}/></View></View>:<>
+   <View style={styles.items}>{items.map(i=><View key={`${i.id}-${i.size}`} style={styles.item}><Image source={{uri:i.image}} style={styles.itemImage}/><View style={styles.itemInfo}><View style={styles.itemTop}><View style={{flex:1,paddingRight:8}}><Text numberOfLines={2} style={styles.itemName}>{i.name}</Text><Text style={styles.itemMeta}>Tamanho {i.size} · {i.category}</Text></View><Pressable onPress={()=>remove(i.id,i.size)} hitSlop={8}><Ionicons name="close" size={18} color={theme.colors.muted}/></Pressable></View><Text style={styles.itemPrice}>{money((i.discountPrice??i.price)*i.quantity)}</Text><View style={styles.qty}><Pressable onPress={()=>change(i.id,i.size,-1)}><Ionicons name="remove" size={15} color={theme.colors.text}/></Pressable><Text style={styles.qtyText}>{i.quantity}</Text><Pressable onPress={()=>change(i.id,i.size,1)}><Ionicons name="add" size={15} color={theme.colors.text}/></Pressable></View></View></View>)}</View>
+   <View style={styles.couponRow}><TextInput value={coupon} onChangeText={setCoupon} placeholder="Cupom de desconto" placeholderTextColor={theme.colors.muted} style={styles.couponInput}/><Pressable onPress={()=>coupon.trim()&&setApplied(true)} style={styles.apply}><Text style={styles.applyText}>APLICAR</Text></Pressable></View>
+   {applied&&<Text style={styles.success}>✓ Cupom aplicado com sucesso — 10% de desconto</Text>}
+   <View style={styles.summary}><Text style={styles.summaryTitle}>RESUMO</Text><Row label="Subtotal" value={money(subtotal)}/>{applied&&<Row label="Desconto" value={`− ${money(discount)}`} accent/>}<View style={styles.divider}/><Row label="Total" value={money(total)} strong accent/></View>
+   <View style={styles.full}><Button label="FINALIZAR COMPRA" onPress={()=>navigation.navigate('Checkout')}/></View>
+  </>}
+ </View></Screen>
+}
+function Row({label,value,accent=false,strong=false}:{label:string;value:string;accent?:boolean;strong?:boolean}){return <View style={styles.row}><Text style={[styles.rowLabel,strong&&styles.strong]}>{label}</Text><Text style={[styles.rowValue,accent&&styles.accent,strong&&styles.total]}>{value}</Text></View>}
+const styles=StyleSheet.create({page:{padding:16},title:{color:theme.colors.text,fontFamily:theme.fonts.display,fontSize:38,lineHeight:42},items:{gap:12,marginTop:22},item:{backgroundColor:theme.colors.surface,borderRadius:9,padding:12,flexDirection:'row'},itemImage:{width:90,height:114,borderRadius:5,backgroundColor:theme.colors.surface2},itemInfo:{flex:1,paddingLeft:13},itemTop:{flexDirection:'row'},itemName:{color:theme.colors.text,fontSize:13,fontWeight:'800',lineHeight:17},itemMeta:{color:theme.colors.muted,fontSize:10,marginTop:5},itemPrice:{color:theme.colors.accent,fontFamily:theme.fonts.display,fontSize:21,marginTop:11},qty:{width:96,height:34,borderWidth:1,borderColor:theme.colors.surface2,borderRadius:5,flexDirection:'row',alignItems:'center',justifyContent:'space-around',marginTop:8},qtyText:{color:theme.colors.text,fontSize:11,fontWeight:'800'},couponRow:{flexDirection:'row',gap:8,marginTop:22},couponInput:{flex:1,height:44,borderRadius:5,backgroundColor:theme.colors.surface,color:theme.colors.text,paddingHorizontal:12,fontSize:12},apply:{width:92,height:44,borderRadius:5,backgroundColor:theme.colors.surface2,alignItems:'center',justifyContent:'center'},applyText:{color:theme.colors.text,fontSize:10,fontWeight:'900'},success:{color:theme.colors.success,fontSize:10,marginTop:8},summary:{backgroundColor:theme.colors.surface,borderRadius:9,padding:18,marginTop:18,gap:12},summaryTitle:{color:theme.colors.muted,fontSize:10,fontWeight:'900',letterSpacing:1},row:{flexDirection:'row',justifyContent:'space-between',alignItems:'center'},rowLabel:{color:theme.colors.muted,fontSize:12},rowValue:{color:theme.colors.text,fontSize:12},strong:{color:theme.colors.text,fontWeight:'900'},accent:{color:theme.colors.accent},total:{fontFamily:theme.fonts.display,fontSize:24,fontWeight:'700'},divider:{height:1,backgroundColor:theme.colors.surface2},full:{marginTop:16},empty:{alignItems:'center',paddingTop:100,paddingBottom:40},emptyTitle:{color:theme.colors.text,fontFamily:theme.fonts.display,fontSize:28,marginTop:18},emptyText:{color:theme.colors.muted,fontSize:12,lineHeight:18,textAlign:'center',marginTop:8,maxWidth:280},
+});
