@@ -1,4 +1,5 @@
-# Galeria Seleta — Mobile (versão final)
+# Galeria Seleta — Mobile 
+
 
 Aplicativo mobile em **React Native + Expo + TypeScript**, reconstruído a partir do frontend do projeto Galeria-Seleta-FullStack.
 
