@@ -54,6 +54,17 @@ Revisão técnica interna realizada sobre o estado atual do projeto, utilizando 
 - A documentação técnica deve acompanhar as alterações do código para que relatório e implementação permaneçam coerentes.
 - Antes da próxima Sprint, deve ser executado um teste completo do fluxo principal em um ambiente Expo.
 
+## Validação técnica complementar
+
+Após a revisão, foi executado um pipeline automatizado no GitHub Actions. A validação confirmou:
+
+- instalação das dependências do aplicativo;
+- checagem TypeScript sem erros;
+- geração do bundle Expo para Android;
+- instalação das dependências da API Node;
+- inicialização da API;
+- resposta válida do endpoint `GET /health`.
+
 ## Resultado da revisão
 
-O incremento da Sprint 1 foi considerado tecnicamente coerente com o escopo planejado e com os requisitos implementáveis nesta etapa. As evoluções identificadas foram registradas para a Sprint seguinte, especialmente integração de pagamento externo e maior integração do backend com o aplicativo.
+O incremento da Sprint 1 foi considerado tecnicamente coerente com o escopo planejado. A compilação/bundle Android e o backend foram validados automaticamente com sucesso. As evoluções identificadas foram registradas para a Sprint seguinte, especialmente integração do Mercado Pago, refinamento das validações de formulário e integração mais ampla entre aplicativo e API.
