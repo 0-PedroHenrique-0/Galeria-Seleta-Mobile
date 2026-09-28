@@ -7,12 +7,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { theme } from './src/theme';
+import { initializeDatabase } from './src/database';
 import { getSession } from './src/storage';
 
 import { HomeScreen } from './src/screens/HomeScreen';
 import { ProductsScreen } from './src/screens/ProductsScreen';
 import { SearchScreen } from './src/screens/SearchScreen';
 import { ProductDetailScreen } from './src/screens/ProductDetailScreen';
+import { ProductAdminScreen } from './src/screens/ProductAdminScreen';
 import { LoginScreen } from './src/screens/LoginScreen';
 import { RegisterScreen } from './src/screens/RegisterScreen';
 import { ForgotPasswordScreen } from './src/screens/ForgotPasswordScreen';
@@ -32,6 +34,7 @@ export type RootStackParamList = {
   Main: undefined;
   Search: undefined;
   ProductDetail: { id: number };
+  ProductAdmin: undefined;
   Login: undefined;
   Register: undefined;
   ForgotPassword: undefined;
@@ -64,9 +67,7 @@ function MainTabs() {
       tabBarInactiveTintColor: theme.colors.muted,
       tabBarLabelStyle: { fontSize: 9, fontWeight: '700' },
       tabBarIcon: ({ color, size }) => {
-        const icons: Record<string, keyof typeof Ionicons.glyphMap> = {
-          Início: 'home-outline', Produtos: 'grid-outline', Carrinho: 'bag-outline', Pedidos: 'receipt-outline', Perfil: 'person-outline'
-        };
+        const icons: Record<string, keyof typeof Ionicons.glyphMap> = { Início: 'home-outline', Produtos: 'grid-outline', Carrinho: 'bag-outline', Pedidos: 'receipt-outline', Perfil: 'person-outline' };
         return <Ionicons name={icons[route.name] ?? 'ellipse-outline'} size={size - 1} color={color} />;
       }
     })}>
@@ -86,6 +87,7 @@ function AppNavigator() {
         <Stack.Screen name="Main" component={MainTabs} />
         <Stack.Screen name="Search" component={SearchScreen} />
         <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
+        <Stack.Screen name="ProductAdmin" component={ProductAdminScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
@@ -105,7 +107,13 @@ function AppNavigator() {
 
 export default function App() {
   const [ready, setReady] = useState(false);
-  useEffect(() => { getSession().finally(() => setReady(true)); }, []);
+
+  useEffect(() => {
+    Promise.all([initializeDatabase(), getSession()])
+      .catch((error) => console.error('Falha ao inicializar o aplicativo:', error))
+      .finally(() => setReady(true));
+  }, []);
+
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
