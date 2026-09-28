@@ -7,7 +7,7 @@ on:
 
 jobs:
   mobile:
-    name: Mobile typecheck and Expo web bundle
+    name: Mobile typecheck and Expo Android bundle
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,8 +20,8 @@ jobs:
         run: npm install
       - name: TypeScript check
         run: npm run typecheck
-      - name: Expo web export
-        run: npx expo export --platform web --output-dir dist
+      - name: Expo Android export
+        run: npx expo export --platform android --output-dir dist
 
   backend:
     name: Backend install and health check
