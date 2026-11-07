@@ -41,7 +41,7 @@ jobs:
       - name: Start API and check health
         shell: bash
         run: |
-          node src/server.js > /tmp/galeria-api.log 2>&1 &
+          AUTH_SECRET="$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("hex"))')" node src/server.js > /tmp/galeria-api.log 2>&1 &
           PID=$!
           trap 'kill $PID || true' EXIT
           for i in {1..20}; do
