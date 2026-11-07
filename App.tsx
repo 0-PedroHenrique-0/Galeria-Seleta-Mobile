@@ -17,7 +17,6 @@ import { ProductDetailScreen } from './src/screens/ProductDetailScreen';
 import { ProductAdminScreen } from './src/screens/ProductAdminScreen';
 import { LoginScreen } from './src/screens/LoginScreen';
 import { RegisterScreen } from './src/screens/RegisterScreen';
-import { ForgotPasswordScreen } from './src/screens/ForgotPasswordScreen';
 import { CartScreen } from './src/screens/CartScreen';
 import { CheckoutScreen } from './src/screens/CheckoutScreen';
 import { OrderSuccessScreen } from './src/screens/OrderSuccessScreen';
@@ -26,7 +25,6 @@ import { OrderDetailScreen } from './src/screens/OrderDetailScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
 import { AddressesScreen } from './src/screens/AddressesScreen';
 import { PersonalDataScreen } from './src/screens/PersonalDataScreen';
-import { ChangePasswordScreen } from './src/screens/ChangePasswordScreen';
 import { AboutScreen } from './src/screens/AboutScreen';
 import { ContactScreen } from './src/screens/ContactScreen';
 
@@ -37,14 +35,12 @@ export type RootStackParamList = {
   ProductAdmin: undefined;
   Login: undefined;
   Register: undefined;
-  ForgotPassword: undefined;
   Cart: undefined;
   Checkout: undefined;
   OrderSuccess: { orderId: string };
   OrderDetail: { orderId: string };
   Addresses: undefined;
   PersonalData: undefined;
-  ChangePassword: undefined;
   About: undefined;
   Contact: undefined;
 };
@@ -82,7 +78,7 @@ function MainTabs() {
 
 function AppNavigator() {
   return (
-    <NavigationContainer theme={navTheme}>
+    <NavigationContainer theme={navTheme} linking={{ prefixes: ['galeriaseleta://'], config: { screens: { OrderDetail: 'checkout/return/:orderId' } } }}>
       <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme.colors.bg } }}>
         <Stack.Screen name="Main" component={MainTabs} />
         <Stack.Screen name="Search" component={SearchScreen} />
@@ -90,14 +86,12 @@ function AppNavigator() {
         <Stack.Screen name="ProductAdmin" component={ProductAdminScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="Cart" component={CartScreen} />
         <Stack.Screen name="Checkout" component={CheckoutScreen} />
         <Stack.Screen name="OrderSuccess" component={OrderSuccessScreen} />
         <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
         <Stack.Screen name="Addresses" component={AddressesScreen} />
         <Stack.Screen name="PersonalData" component={PersonalDataScreen} />
-        <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
         <Stack.Screen name="About" component={AboutScreen} />
         <Stack.Screen name="Contact" component={ContactScreen} />
       </Stack.Navigator>

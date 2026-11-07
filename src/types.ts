@@ -15,6 +15,8 @@ export type CartItem = Product & {
   quantity: number;
 };
 
+export type OrderItem = { id: number; name: string; size: string; quantity: number; price: number; image: string };
+
 export type Address = {
   id: string;
   label: string;
@@ -29,12 +31,13 @@ export type Address = {
 export type Order = {
   id: string;
   date: string;
-  status: 'PROCESSANDO' | 'ENVIADO' | 'ENTREGUE';
-  items: CartItem[];
+  paymentStatus: 'AGUARDANDO_PAGAMENTO' | 'EM_ANALISE' | 'APROVADO' | 'RECUSADO' | 'CANCELADO' | 'EXPIRADO' | 'REEMBOLSADO' | 'REVISAO_MANUAL';
+  fulfillmentStatus: 'NAO_INICIADO' | 'PROCESSANDO' | 'ENVIADO' | 'ENTREGUE';
+  items: OrderItem[];
   subtotal: number;
   shipping: number;
   discount: number;
   total: number;
-  payment: string;
   address: Address;
+  checkoutUrl?: string | null;
 };

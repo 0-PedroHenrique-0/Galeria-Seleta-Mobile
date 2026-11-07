@@ -1,22 +1,109 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
 import { Screen } from '../components/Screen';
-import { Field } from '../components/Field';
 import { Button } from '../components/Button';
-import { getAddresses, getCart, getOrders, saveCart, saveOrders } from '../storage';
-import { Address, CartItem, Order } from '../types';
-import { DEFAULT_ADDRESS } from '../data';
+import { getAddresses, getCart, getSession } from '../storage';
+import { createCheckout, quoteApi } from '../api';
+import { Address, CartItem } from '../types';
 import { theme } from '../theme';
-const money=(v:number)=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-export function CheckoutScreen({navigation}:any){const[step,setStep]=useState(1);const[items,setItems]=useState<CartItem[]>([]);const[address,setAddress]=useState<Address>(DEFAULT_ADDRESS);const[payment,setPayment]=useState<'pix'|'cartao'|'boleto'|'dinheiro'>('pix');const[shipping,setShipping]=useState(29.9);
- useEffect(()=>{Promise.all([getCart(),getAddresses()]).then(([cart,addresses])=>{setItems(cart);setAddress(addresses.find(a=>a.isDefault)||addresses[0]||DEFAULT_ADDRESS)})},[]);
- const subtotal=useMemo(()=>items.reduce((s,i)=>s+(i.discountPrice??i.price)*i.quantity,0),[items]);const pixDiscount=payment==='pix'?subtotal*.1:0;const total=subtotal+shipping-pixDiscount;
- async function confirm(){const id=`GS-${String(Date.now()).slice(-6)}`;const order:Order={id,date:new Date().toLocaleDateString('pt-BR'),status:'PROCESSANDO',items,subtotal,shipping,discount:pixDiscount,total,payment,address};const orders=await getOrders();await saveOrders([order,...orders]);await saveCart([]);navigation.navigate('OrderSuccess',{orderId:id})}
- return <Screen><View style={styles.page}><Text style={styles.kicker}>GALERIA SELETA</Text><Text style={styles.title}>{step===1?'Finalizar':'Pagamento'}</Text><Text style={[styles.title,styles.italic]}>{step===1?'compra':'confirmar'}</Text><View style={styles.steps}><Step n="1" text="Entrega" active={step===1}/><View style={styles.stepLine}/><Step n="2" text="Pagamento" active={step===2}/></View>{step===1?<><Section label="INFORMAÇÕES DE ENTREGA"><View style={styles.card}><Text style={styles.cardTitle}>Entrega principal</Text><Text style={styles.cardText}>{address.street}</Text><Text style={styles.cardText}>{address.city} — {address.state} · {address.zip}</Text><Pressable onPress={()=>navigation.navigate('Addresses')}><Text style={styles.link}>ALTERAR ENDEREÇO</Text></Pressable></View></Section><Section label="FRETE"><Option title="Padrão · 5–7 dias" value={29.9} selected={shipping===29.9} onPress={()=>setShipping(29.9)}/><Option title="Expresso · 1–3 dias" value={54.9} selected={shipping===54.9} onPress={()=>setShipping(54.9)}/></Section><Section label="PAGAMENTO"><Option title="PIX · 10% de desconto" selected={payment==='pix'} onPress={()=>setPayment('pix')}/><Option title="Cartão de crédito" selected={payment==='cartao'} onPress={()=>setPayment('cartao')}/><Option title="Boleto bancário" selected={payment==='boleto'} onPress={()=>setPayment('boleto')}/><Option title="Dinheiro na retirada" selected={payment==='dinheiro'} onPress={()=>setPayment('dinheiro')}/></Section><Button label="CONTINUAR PARA PAGAMENTO  ›" disabled={items.length===0} onPress={()=>setStep(2)}/></>:<><Section label="RESUMO DA COMPRA"><View style={styles.summary}><Row l="Subtotal" v={money(subtotal)}/><Row l="Frete" v={money(shipping)}/>{pixDiscount>0&&<Row l="Desconto PIX" v={`− ${money(pixDiscount)}`} accent/>}<View style={styles.divider}/><Row l="Total" v={money(total)} strong accent/></View></Section><Section label="FORMA DE PAGAMENTO"><View style={styles.paymentBox}><Ionicons name={payment==='pix'?'qr-code-outline':payment==='cartao'?'card-outline':payment==='boleto'?'document-text-outline':'storefront-outline'} size={22} color={theme.colors.accent}/><View style={{flex:1,marginLeft:12}}><Text style={styles.cardTitle}>{payment==='pix'?'PIX':payment==='cartao'?'Cartão de crédito':payment==='boleto'?'Boleto bancário':'Dinheiro na retirada'}</Text><Text style={styles.cardText}>{payment==='pix'?'Desconto de 10% aplicado.':payment==='dinheiro'?'Pagamento no endereço da loja.':'Pagamento demonstrativo, sem integração externa.'}</Text></View></View></Section>{payment==='pix'&&<View style={styles.paymentDetail}><Text style={styles.detailTitle}>QrCode</Text><View style={styles.qr}><View style={styles.qrBox}/><View style={styles.qrBox}/><View style={styles.qrBox}/><View style={styles.qrCenter}/></View><Text style={styles.pixCode}>00020126580014BR.GOV.BCB.PIX0136GALERIA-SELETA-DEMO</Text><Button label="COPIAR CÓDIGO PIX" secondary onPress={()=>{}}/><Text style={styles.instructions}>1. Abra o app da instituição{`\n`}2. Escaneie o QR Code ou cole o código{`\n`}3. Valide e finalize o pagamento</Text></View>}{payment==='cartao'&&<View style={styles.paymentDetail}><Text style={styles.detailTitle}>Dados do cartão</Text><Field label="NÚMERO DO CARTÃO" placeholder="0000 0000 0000 0000" keyboardType="number-pad"/><Field label="NOME NO CARTÃO" placeholder="Nome completo"/><View style={styles.twoFields}><View style={{flex:1}}><Field label="VALIDADE" placeholder="MM/AA"/></View><View style={{flex:1}}><Field label="CVV" placeholder="000" keyboardType="number-pad"/></View></View></View>}{payment==='boleto'&&<View style={styles.paymentDetail}><Text style={styles.detailTitle}>Seu boleto</Text><Text style={styles.cardText}>O boleto vence em <Text style={styles.strongText}>3 dias úteis</Text>. Após o pagamento, a confirmação pode levar até 2 dias úteis.</Text></View>}{payment==='dinheiro'&&<View style={styles.paymentDetail}><Text style={styles.detailTitle}>Pagamento na retirada</Text><Text style={styles.cardText}>Leve o valor exato de <Text style={styles.strongText}>{money(total)}</Text> no momento da retirada.</Text><Text style={styles.cardText}>Av. Rio Bonito, 9021{`\n`}SEG – SEX 10:00–18:00 · SÁB 10:00–17:00</Text></View>}<Button label={payment==='pix'?'PAGAMENTO REALIZADO  ›':'FINALIZAR PEDIDO  ›'} onPress={confirm}/><Pressable onPress={()=>setStep(1)}><Text style={styles.back}>← Voltar e alterar pedido</Text></Pressable></>}</View></Screen>}
-function Step({n,text,active}:{n:string;text:string;active:boolean}){return <View style={styles.step}><View style={[styles.stepCircle,active&&styles.stepActive]}><Text style={[styles.stepN,active&&styles.stepNActive]}>{n}</Text></View><Text style={[styles.stepText,active&&styles.stepTextActive]}>{text}</Text></View>}
-function Section({label,children}:{label:string;children:React.ReactNode}){return <View style={styles.section}><Text style={styles.sectionLabel}>{label}</Text>{children}</View>}
-function Option({title,value,selected,onPress}:{title:string;value?:number;selected:boolean;onPress:()=>void}){return <Pressable onPress={onPress} style={[styles.option,selected&&styles.optionActive]}><View style={[styles.radio,selected&&styles.radioActive]}>{selected&&<View style={styles.radioDot}/>}</View><Text style={[styles.optionText,selected&&styles.optionTextActive]}>{title}</Text>{value!==undefined&&<Text style={[styles.optionPrice,selected&&styles.optionTextActive]}>{money(value)}</Text>}</Pressable>}
-function Row({l,v,accent=false,strong=false}:{l:string;v:string;accent?:boolean;strong?:boolean}){return <View style={styles.row}><Text style={[styles.rowL,strong&&styles.strong]}>{l}</Text><Text style={[styles.rowV,accent&&styles.accent,strong&&styles.total]}>{v}</Text></View>}
-const styles=StyleSheet.create({page:{padding:20},kicker:{color:theme.colors.accent,fontSize:10,fontWeight:'900',letterSpacing:1.4},title:{color:theme.colors.text,fontFamily:theme.fonts.display,fontSize:43,lineHeight:40,marginTop:8},italic:{fontStyle:'italic'},steps:{flexDirection:'row',alignItems:'center',marginTop:24,marginBottom:28},step:{flexDirection:'row',alignItems:'center',gap:7},stepCircle:{width:25,height:25,borderRadius:13,borderWidth:1,borderColor:theme.colors.surface2,alignItems:'center',justifyContent:'center'},stepActive:{backgroundColor:theme.colors.accent,borderColor:theme.colors.accent},stepN:{color:theme.colors.muted,fontSize:10,fontWeight:'800'},stepNActive:{color:theme.colors.bg},stepText:{color:theme.colors.muted,fontSize:10,fontWeight:'700'},stepTextActive:{color:theme.colors.text},stepLine:{flex:1,height:1,backgroundColor:theme.colors.line,marginHorizontal:10},section:{marginBottom:22},sectionLabel:{color:theme.colors.accent,fontSize:10,fontWeight:'900',letterSpacing:1.3,marginBottom:9},card:{backgroundColor:theme.colors.surface,borderRadius:8,padding:16},cardTitle:{color:theme.colors.text,fontSize:13,fontWeight:'800'},cardText:{color:theme.colors.muted,fontSize:11,lineHeight:18,marginTop:4},link:{color:theme.colors.accent,fontSize:9,fontWeight:'900',letterSpacing:.7,marginTop:12},option:{minHeight:48,backgroundColor:theme.colors.surface2,borderRadius:6,paddingHorizontal:13,flexDirection:'row',alignItems:'center',marginBottom:8},optionActive:{backgroundColor:theme.colors.accent},radio:{width:17,height:17,borderRadius:9,borderWidth:1,borderColor:theme.colors.muted,alignItems:'center',justifyContent:'center'},radioActive:{borderColor:theme.colors.bg},radioDot:{width:7,height:7,borderRadius:4,backgroundColor:theme.colors.bg},optionText:{flex:1,color:theme.colors.text,fontSize:11,fontWeight:'700',marginLeft:10},optionTextActive:{color:theme.colors.bg},optionPrice:{color:theme.colors.muted,fontSize:10,fontWeight:'700'},summary:{backgroundColor:theme.colors.surface,borderRadius:8,padding:17,gap:12},row:{flexDirection:'row',justifyContent:'space-between',alignItems:'center'},rowL:{color:theme.colors.muted,fontSize:12},rowV:{color:theme.colors.text,fontSize:12},strong:{color:theme.colors.text,fontWeight:'900'},accent:{color:theme.colors.accent},total:{fontFamily:theme.fonts.display,fontSize:24},divider:{height:1,backgroundColor:theme.colors.surface2},paymentBox:{backgroundColor:theme.colors.surface,borderRadius:8,padding:16,flexDirection:'row',alignItems:'center'},paymentDetail:{backgroundColor:theme.colors.surface,borderRadius:8,padding:16,marginTop:-10,marginBottom:22},detailTitle:{color:theme.colors.text,fontFamily:theme.fonts.display,fontSize:23,marginBottom:14},qr:{width:170,height:170,alignSelf:'center',backgroundColor:theme.colors.white,padding:14,position:'relative',flexDirection:'row',justifyContent:'space-between'},qrBox:{width:45,height:45,borderWidth:8,borderColor:'#111'},qrCenter:{position:'absolute',width:38,height:38,left:66,top:66,backgroundColor:'#111'},pixCode:{color:theme.colors.muted,fontSize:9,lineHeight:14,marginTop:14,marginBottom:10},instructions:{color:theme.colors.muted,fontSize:10,lineHeight:17,marginTop:14},twoFields:{flexDirection:'row',gap:12},strongText:{color:theme.colors.text,fontWeight:'800'},back:{color:theme.colors.muted,textAlign:'center',fontSize:11,marginTop:20},
+
+const money = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const newKey = () => `checkout-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+
+export function CheckoutScreen({ navigation }: any) {
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [address, setAddress] = useState<Address | null>(null);
+  const [shippingCode, setShippingCode] = useState<'standard' | 'express'>('standard');
+  const [quote, setQuote] = useState<{ subtotal: number; shipping: number; discount: number; total: number } | null>(null);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const key = useRef(newKey());
+
+  useEffect(() => {
+    const load = async () => {
+      const [cart, addresses, signedIn] = await Promise.all([getCart(), getAddresses(), getSession()]);
+      setItems(cart);
+      setAddress(addresses.find(a => a.isDefault) || addresses[0] || null);
+      if (!signedIn) setError('Entre na sua conta para finalizar a compra.');
+    };
+    load().catch(e => setError(e instanceof Error ? e.message : 'Falha ao carregar o checkout.'));
+    const unsubscribe = navigation.addListener('focus', load);
+    return unsubscribe;
+  }, [navigation]);
+
+  useEffect(() => {
+    if (!items.length) return;
+    let active = true;
+    key.current = newKey();
+    setQuote(null);
+    quoteApi(items, shippingCode).then(result => { if (active) { setQuote(result); setError(''); } })
+      .catch(e => { if (active) setError(e instanceof Error ? e.message : 'Falha ao calcular o pedido.'); });
+    return () => { active = false; };
+  }, [items, shippingCode]);
+
+  async function pay() {
+    if (!address || !quote || busy) return;
+    try {
+      setBusy(true); setError('');
+      const session = await createCheckout(items, address, shippingCode, key.current);
+      navigation.navigate('OrderDetail', { orderId: session.orderId });
+      await WebBrowser.openBrowserAsync(session.checkoutUrl);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Não foi possível iniciar o pagamento.');
+    } finally { setBusy(false); }
+  }
+
+  return <Screen><View style={styles.page}>
+    <Text style={styles.kicker}>GALERIA SELETA</Text>
+    <Text style={styles.title}>Finalizar compra</Text>
+    <Text style={styles.section}>ENTREGA</Text>
+    <View style={styles.card}>
+      {address ? <>
+        <Text style={styles.strong}>{address.street}</Text>
+        <Text style={styles.muted}>{address.city} — {address.state} · {address.zip}</Text>
+      </> : <Text style={styles.muted}>Cadastre um endereço de entrega.</Text>}
+      <Pressable onPress={() => navigation.navigate('Addresses')}><Text style={styles.link}>ALTERAR ENDEREÇO</Text></Pressable>
+    </View>
+    <Text style={styles.section}>FRETE</Text>
+    <Option label="Padrão · 5–7 dias" value={money(29.9)} selected={shippingCode === 'standard'} onPress={() => setShippingCode('standard')}/>
+    <Option label="Expresso · 1–3 dias" value={money(54.9)} selected={shippingCode === 'express'} onPress={() => setShippingCode('express')}/>
+    <Text style={styles.section}>RESUMO</Text>
+    <View style={styles.card}>
+      {quote ? <>
+        <Row label="Subtotal" value={money(quote.subtotal)}/>
+        <Row label="Frete" value={money(quote.shipping)}/>
+        <View style={styles.divider}/>
+        <Row label="Total" value={money(quote.total)} strong/>
+      </> : <ActivityIndicator color={theme.colors.accent}/>}
+    </View>
+    <Text style={styles.muted}>Pix, cartão e boleto são escolhidos no ambiente seguro do Mercado Pago. O pedido será confirmado após a aprovação do pagamento.</Text>
+    {!!error && <Text style={styles.error}>{error}</Text>}
+    <Button label={busy ? 'ABRINDO PAGAMENTO...' : 'PAGAR COM MERCADO PAGO'} disabled={busy || !quote || !items.length || !address} onPress={pay}/>
+    {error.includes('Entre na sua conta') && <View style={{ marginTop: 12 }}><Button label="ENTRAR" secondary onPress={() => navigation.navigate('Login')}/></View>}
+  </View></Screen>;
+}
+function Option({ label, value, selected, onPress }: { label: string; value: string; selected: boolean; onPress: () => void }) {
+  return <Pressable onPress={onPress} style={[styles.option, selected && styles.optionActive]}>
+    <Text style={styles.optionText}>{selected ? '◉' : '○'}  {label}</Text><Text style={styles.optionText}>{value}</Text>
+  </Pressable>;
+}
+function Row({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+  return <View style={styles.row}><Text style={[styles.muted, strong && styles.strong]}>{label}</Text><Text style={[styles.muted, strong && styles.total]}>{value}</Text></View>;
+}
+const styles = StyleSheet.create({
+  page: { padding: 20 }, kicker: { color: theme.colors.accent, fontSize: 10, fontWeight: '900', letterSpacing: 1.4 },
+  title: { color: theme.colors.text, fontFamily: theme.fonts.display, fontSize: 42, marginTop: 8, marginBottom: 14 },
+  section: { color: theme.colors.accent, fontSize: 10, fontWeight: '900', letterSpacing: 1.3, marginTop: 24, marginBottom: 10 },
+  card: { backgroundColor: theme.colors.surface, borderRadius: 8, padding: 17, gap: 10 },
+  strong: { color: theme.colors.text, fontWeight: '900', fontSize: 13 },
+  muted: { color: theme.colors.muted, fontSize: 12, lineHeight: 19, marginTop: 10 },
+  link: { color: theme.colors.accent, fontSize: 10, fontWeight: '900', marginTop: 12 },
+  option: { minHeight: 50, backgroundColor: theme.colors.surface2, borderRadius: 6, paddingHorizontal: 13, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  optionActive: { borderWidth: 1, borderColor: theme.colors.accent },
+  optionText: { color: theme.colors.text, fontSize: 11, fontWeight: '700' },
+  divider: { height: 1, backgroundColor: theme.colors.surface2 },
+  row: { flexDirection: 'row', justifyContent: 'space-between' },
+  total: { color: theme.colors.accent, fontFamily: theme.fonts.display, fontSize: 23 },
+  error: { color: theme.colors.error, fontSize: 12, marginVertical: 14 },
 });

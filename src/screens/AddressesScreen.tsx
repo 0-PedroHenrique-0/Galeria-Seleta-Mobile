@@ -1,12 +1,57 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { Screen } from '../components/Screen';
 import { Button } from '../components/Button';
 import { Field } from '../components/Field';
 import { getAddresses, saveAddresses } from '../storage';
 import { Address } from '../types';
 import { theme } from '../theme';
-export function AddressesScreen(){const[addresses,setAddresses]=useState<Address[]>([]);const[adding,setAdding]=useState(false);const[street,setStreet]=useState('');const[city,setCity]=useState('');const[zip,setZip]=useState('');useEffect(()=>{getAddresses().then(setAddresses)},[]);async function add(){const next=[...addresses,{id:`addr-${Date.now()}`,label:'Novo endereço',street:street||'Rua, número',city:city||'São Paulo',state:'SP',zip:zip||'00000-000',isDefault:addresses.length===0}];setAddresses(next);await saveAddresses(next);setAdding(false);setStreet('');setCity('');setZip('')};async function makeDefault(id:string){const next=addresses.map(a=>({...a,isDefault:a.id===id}));setAddresses(next);await saveAddresses(next)}
- return <Screen><View style={styles.page}><Text style={styles.title}>Meus endereços</Text><Text style={styles.sub}>Gerencie os locais usados para suas entregas.</Text><View style={styles.list}>{addresses.map(a=><View key={a.id} style={styles.card}><View style={styles.cardTop}><Text style={styles.cardTitle}>{a.label}</Text>{a.isDefault&&<Text style={styles.default}>PADRÃO</Text>}</View><Text style={styles.text}>{a.street}</Text><Text style={styles.text}>{a.city} — {a.state} · {a.zip}</Text>{!a.isDefault&&<Pressable onPress={()=>makeDefault(a.id)}><Text style={styles.link}>TORNAR PADRÃO</Text></Pressable>}</View>)}</View>{adding?<View style={styles.form}><Field label="ENDEREÇO" value={street} onChangeText={setStreet} placeholder="Rua, número, complemento"/><Field label="CIDADE" value={city} onChangeText={setCity} placeholder="São Paulo"/><Field label="CEP" value={zip} onChangeText={setZip} keyboardType="number-pad" placeholder="00000-000"/><Button label="SALVAR ENDEREÇO" onPress={add}/><Pressable onPress={()=>setAdding(false)}><Text style={styles.cancel}>Cancelar</Text></Pressable></View>:<View style={{marginTop:18}}><Button label="ADICIONAR NOVO ENDEREÇO" secondary onPress={()=>setAdding(true)}/></View>}</View></Screen>}
-const styles=StyleSheet.create({page:{padding:20},title:{color:theme.colors.text,fontFamily:theme.fonts.display,fontSize:39},sub:{color:theme.colors.muted,fontSize:12,marginTop:6},list:{gap:10,marginTop:22},card:{backgroundColor:theme.colors.surface,borderRadius:8,padding:16},cardTop:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginBottom:8},cardTitle:{color:theme.colors.text,fontWeight:'800',fontSize:13},default:{color:theme.colors.accent,fontSize:8,fontWeight:'900',letterSpacing:1},text:{color:theme.colors.muted,fontSize:11,lineHeight:18},link:{color:theme.colors.accent,fontSize:9,fontWeight:'900',letterSpacing:.8,marginTop:12},form:{marginTop:22},cancel:{color:theme.colors.muted,textAlign:'center',fontSize:11,marginTop:16}});
+
+export function AddressesScreen({ navigation }: any) {
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [adding, setAdding] = useState(false);
+  const [street, setStreet] = useState(''), [city, setCity] = useState(''), [state, setState] = useState('');
+  const [zip, setZip] = useState(''), [error, setError] = useState('');
+  useEffect(() => { getAddresses().then(setAddresses); }, []);
+  async function add() {
+    if (street.trim().length < 5 || city.trim().length < 2 || !/^[A-Za-z]{2}$/.test(state.trim()) || !/^\d{8}$/.test(zip.replace(/\D/g, '')) || zip.replace(/\D/g, '') === '00000000') {
+      setError('Informe rua e número, cidade, UF e CEP válido.');
+      return;
+    }
+    const next = [...addresses, {
+      id: `addr-${Date.now()}`, label: 'Endereço', street: street.trim(), city: city.trim(),
+      state: state.trim().toUpperCase(), zip: zip.replace(/\D/g, ''), isDefault: addresses.length === 0,
+    }];
+    setAddresses(next); await saveAddresses(next); setAdding(false); setError('');
+  }
+  async function makeDefault(id: string) {
+    const next = addresses.map(address => ({ ...address, isDefault: address.id === id }));
+    setAddresses(next); await saveAddresses(next);
+  }
+  return <Screen><View style={styles.page}>
+    <Text style={styles.title}>Meus endereços</Text>
+    <Text style={styles.muted}>Escolha um endereço válido para receber seu pedido.</Text>
+    {addresses.map(address => <View key={address.id} style={styles.card}>
+      <Text style={styles.strong}>{address.street} {address.isDefault ? '· PADRÃO' : ''}</Text>
+      <Text style={styles.muted}>{address.city} — {address.state} · {address.zip}</Text>
+      {!address.isDefault && <Pressable onPress={() => makeDefault(address.id)}><Text style={styles.link}>TORNAR PADRÃO</Text></Pressable>}
+    </View>)}
+    {adding ? <View style={styles.form}>
+      <Field label="RUA E NÚMERO" value={street} onChangeText={setStreet} placeholder="Rua, número"/>
+      <Field label="CIDADE" value={city} onChangeText={setCity} placeholder="São Paulo"/>
+      <Field label="UF" value={state} onChangeText={setState} autoCapitalize="characters" placeholder="SP"/>
+      <Field label="CEP" value={zip} onChangeText={setZip} keyboardType="number-pad" placeholder="00000-000"/>
+      {!!error && <Text style={styles.error}>{error}</Text>}
+      <Button label="SALVAR ENDEREÇO" onPress={add}/>
+    </View> : <View style={styles.form}><Button label="ADICIONAR ENDEREÇO" secondary onPress={() => setAdding(true)}/></View>}
+    <View style={styles.form}><Button label="VOLTAR" secondary onPress={() => navigation.goBack()}/></View>
+  </View></Screen>;
+}
+const styles = StyleSheet.create({
+  page: { padding: 20 }, title: { color: theme.colors.text, fontFamily: theme.fonts.display, fontSize: 39 },
+  muted: { color: theme.colors.muted, fontSize: 12, lineHeight: 18, marginTop: 7 },
+  card: { backgroundColor: theme.colors.surface, borderRadius: 8, padding: 16, marginTop: 12 },
+  strong: { color: theme.colors.text, fontSize: 13, fontWeight: '800' },
+  link: { color: theme.colors.accent, fontSize: 10, fontWeight: '900', marginTop: 12 },
+  form: { marginTop: 20 }, error: { color: theme.colors.error, marginBottom: 12 },
+});
