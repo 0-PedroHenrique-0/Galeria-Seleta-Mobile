@@ -5,13 +5,12 @@ Aplicativo mobile em **React Native + Expo + TypeScript**, desenvolvido para o P
 ## Escopo atual
 
 - **Frontend mobile:** React Native + Expo + TypeScript.
-- **Banco mobile local:** SQLite com `expo-sqlite`.
-- **Persistência complementar:** AsyncStorage para carrinho, sessão, endereços e pedidos.
-- **Backend:** configuração inicial em Node.js + Express no diretório `/backend`.
+- **Persistência:** SQLite no backend para catálogo, contas, pedidos e pagamentos; AsyncStorage no app para carrinho, endereços e sessão.
+- **Backend:** Node.js + Express no diretório `/backend`.
 - **Navegação:** React Navigation com stack + tabs inferiores.
 - **Identidade visual:** Urban Dark, seguindo o frontend original.
-- **Cadastro de produtos:** CRUD local com inserir, consultar, alterar e excluir.
-- **Fluxos:** busca, catálogo, filtros/ordenação, detalhe do produto, carrinho, checkout, confirmação, pedidos, perfil, endereços, dados pessoais, alteração de senha, cadastro, login, recuperação de senha, sobre e contato.
+- **Cadastro de produtos:** CRUD na API, restrito ao e-mail de administrador configurado.
+- **Fluxos:** busca, catálogo, filtros/ordenação, detalhe do produto, carrinho, checkout, confirmação, pedidos, perfil, endereços, dados pessoais, cadastro, login, sobre e contato.
 
 ## Identidade visual
 
@@ -31,42 +30,39 @@ npm install
 npx expo start
 ```
 
-Depois escolha Android ou iOS pelo Expo CLI. O banco `galeria-seleta.db` é criado automaticamente na primeira inicialização.
+Depois escolha Android ou iOS pelo Expo CLI. Inicie também a API e defina `EXPO_PUBLIC_API_URL` quando o endereço padrão não for acessível pelo aparelho.
 
 ## Como executar a API Node
 
 ```bash
 cd backend
 npm install
-npm run dev
+node --env-file=.env src/server.js
 ```
 
-A API inicia em `http://localhost:3333` e disponibiliza endpoint de saúde e CRUD REST de produtos.
+A API inicia em `http://localhost:3333`. Configure `backend/.env` antes de executar; veja [backend/README.md](backend/README.md).
 
 ## Estrutura
 
-- `App.tsx` — navegação e inicialização do banco local.
-- `src/database.ts` — criação e operações SQLite.
+- `App.tsx` — navegação e retorno por deep link.
+- `src/database.ts` e `src/api.ts` — acesso à API.
 - `src/data.ts` — dados iniciais e conteúdo local.
 - `src/storage.ts` — persistência AsyncStorage.
 - `src/screens/ProductAdminScreen.tsx` — CRUD de produtos.
 - `database/schema.sql` — script SQL das tabelas principais.
 - `docs/Sprint-1/DER.md` — Diagrama Entidade-Relacionamento.
-- `backend/` — configuração da API Node/Express.
+- `backend/` — API, banco SQLite, autenticação e pagamentos.
 
-## Banco local
+## Persistência
 
-O SQLite possui as tabelas principais solicitadas no roteiro:
-
-- `users`
-- `appointments`
-- `products`
-- `services`
-
-Os produtos existentes em `src/data.ts` são usados como carga inicial. Após a inicialização, catálogo, busca, detalhes e CRUD consultam a tabela `products` do SQLite.
+O banco SQLite da API fica em `backend/data/galeria.sqlite` por padrão. O catálogo inicial é copiado de `backend/src/catalog.json`. O arquivo `database/schema.sql` e os documentos da Sprint 1 registram a estrutura anterior do projeto.
 
 ## Sprint 1
 
 As evidências técnicas da primeira Sprint estão organizadas em `docs/Sprint-1/` e `database/`.
 
-A integração de pagamento externo permanece como evolução para a etapa seguinte do projeto.
+## Pagamento com Mercado Pago
+
+O checkout usa Checkout Pro: a API cria o pedido e a preferência, o app abre o pagamento no Mercado Pago e acompanha a confirmação pela API. Configure a API e as credenciais conforme [backend/README.md](backend/README.md).
+
+Para desenvolvimento local, defina `EXPO_PUBLIC_API_URL` para um endereço da API acessível pelo emulador ou aparelho. Em produção, use uma API pública HTTPS e configure o webhook no painel do Mercado Pago. Os pagamentos reais dependem das credenciais da conta da loja.
