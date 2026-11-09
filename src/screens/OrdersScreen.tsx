@@ -1,10 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../components/Screen';
-import { theme } from '../theme';
-import { getOrders } from '../storage';
+import { getOrdersApi } from '../api';
 import { Order } from '../types';
-const money=(v:number)=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-export function OrdersScreen({navigation}:any){const[orders,setOrders]=useState<Order[]>([]);const load=()=>getOrders().then(setOrders);useEffect(()=>{load();const u=navigation.addListener('focus',load);return u},[navigation]);return <Screen><View style={styles.page}><Text style={styles.title}>Meus pedidos</Text>{orders.length===0?<View style={styles.empty}><Ionicons name="receipt-outline" size={40} color={theme.colors.accent}/><Text style={styles.emptyTitle}>Ainda não há pedidos</Text><Text style={styles.emptyText}>Quando você fizer uma compra, seus pedidos aparecerão aqui.</Text></View>:<View style={styles.list}>{orders.map(o=><Pressable key={o.id} onPress={()=>navigation.navigate('OrderDetail',{orderId:o.id})} style={styles.card}><View style={styles.cardTop}><Text style={styles.id}>Pedido {o.id}</Text><Ionicons name="chevron-forward" size={18} color={theme.colors.muted}/></View><Text style={styles.date}>{o.date}</Text><View style={styles.cardBottom}><Text style={[styles.status,o.status==='ENTREGUE'&&styles.delivered]}>{o.status}</Text><Text style={styles.total}>{money(o.total)}</Text></View></Pressable>)}</View>}</View></Screen>}
-const styles=StyleSheet.create({page:{padding:20},title:{color:theme.colors.text,fontFamily:theme.fonts.display,fontSize:39},list:{gap:12,marginTop:22},card:{backgroundColor:theme.colors.surface,borderRadius:9,padding:16},cardTop:{flexDirection:'row',justifyContent:'space-between',alignItems:'center'},id:{color:theme.colors.text,fontSize:13,fontWeight:'800'},date:{color:theme.colors.muted,fontSize:10,marginTop:7},cardBottom:{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginTop:16},status:{color:theme.colors.accent,fontSize:9,fontWeight:'900',letterSpacing:.7},delivered:{color:theme.colors.success},total:{color:theme.colors.accent,fontFamily:theme.fonts.display,fontSize:20},empty:{alignItems:'center',paddingTop:120},emptyTitle:{color:theme.colors.text,fontFamily:theme.fonts.display,fontSize:28,marginTop:18},emptyText:{color:theme.colors.muted,fontSize:12,lineHeight:18,textAlign:'center',marginTop:8,maxWidth:290}});
+import { theme } from '../theme';
+
+const money = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+export function OrdersScreen({ navigation }: any) {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [error, setError] = useState('');
+  useFocusEffect(useCallback(() => {
+    getOrdersApi().then(setOrders).catch(e => setError(e instanceof Error ? e.message : 'Falha ao carregar pedidos.'));
+  }, []));
+  return <Screen><View style={styles.page}>
+    <Text style={styles.title}>Meus pedidos</Text>
+    {!!error && <Text style={styles.error}>{error}</Text>}
+    {orders.length === 0 ? <Text style={styles.muted}>Seus pedidos aparecerão aqui após iniciar uma compra.</Text> :
+      <View style={styles.list}>{orders.map(order =>
+        <Pressable key={order.id} style={styles.card} onPress={() => navigation.navigate('OrderDetail', { orderId: order.id })}>
+          <Text style={styles.id}>Pedido {order.id.slice(0, 8).toUpperCase()}</Text>
+          <Text style={styles.muted}>{new Date(order.date).toLocaleDateString('pt-BR')}</Text>
+          <View style={styles.row}><Text style={styles.status}>{order.paymentStatus.replace(/_/g, ' ')}</Text><Text style={styles.total}>{money(order.total)}</Text></View>
+        </Pressable>)}</View>}
+  </View></Screen>;
+}
+const styles = StyleSheet.create({
+  page: { padding: 20 }, title: { color: theme.colors.text, fontFamily: theme.fonts.display, fontSize: 39 },
+  list: { gap: 12, marginTop: 22 }, card: { backgroundColor: theme.colors.surface, borderRadius: 9, padding: 16 },
+  id: { color: theme.colors.text, fontSize: 13, fontWeight: '800' },
+  muted: { color: theme.colors.muted, fontSize: 11, marginTop: 8 }, error: { color: theme.colors.error, marginTop: 18 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 },
+  status: { color: theme.colors.accent, fontSize: 9, fontWeight: '900' },
+  total: { color: theme.colors.accent, fontFamily: theme.fonts.display, fontSize: 20 },
+});

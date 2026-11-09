@@ -28,7 +28,8 @@ export function ProductAdminScreen({ navigation }: any) {
   const [error, setError] = useState('');
 
   const load = useCallback(async () => {
-    setProducts(await getProducts());
+    try { setProducts(await getProducts()); }
+    catch (e) { setError(e instanceof Error ? e.message : 'Falha ao carregar produtos.'); }
   }, []);
 
   useFocusEffect(useCallback(() => {
