@@ -11,7 +11,7 @@ Data e participantes: a confirmar pelo grupo.
 - Relatório de vendas em JSON na API (`GET /api/reports/sales`), restrito a administrador.
 - Botão de exportar esse JSON na tela Gerenciar produtos.
 - Dashboard em Python que lê o arquivo e gera o painel em PNG e HTML.
-- Quatro camadas de teste automatizado: unitária do aplicativo, unitária e de integração da API, E2E na build web e testes do dashboard. São 93 testes, todos passando.
+- Quatro camadas de teste automatizado: unitária do aplicativo, unitária e de integração da API, E2E na build web e testes do dashboard. São 96 testes, todos passando.
 - Workflow de CI (`.github/workflows/testes.yml`) com quatro jobs, um por camada.
 - Correção do DER e do `schema.sql`, que descreviam tabelas que não existem.
 - Correção do botão de excluir produto, que não fazia nada na build web.
@@ -23,8 +23,8 @@ Data e participantes: a confirmar pelo grupo.
 | Relatório de vendas em JSON (API) | Devolve resumo, séries por dia, por categoria, por status e ranking de produtos. Só pedido com pagamento aprovado entra em faturamento; datas seguem o horário de Brasília. Cliente comum recebe 403 e anônimo 401, conforme os testes. | Manter. O ranking do dashboard mostra só os 8 primeiros produtos sem avisar no título: deixar isso explícito. | Baixa |
 | Botão de exportar dados | Entrega o arquivo na web (download, exercitado no E2E) e no aparelho (gravar e compartilhar, só testado com módulo simulado). Mostra estado de geração, confirmação e erro. | Fazer um smoke test em aparelho físico ou Expo Go antes de dar o caminho nativo como validado. | Alta |
 | Dashboard em Python | Roda com um comando sobre o JSON de exemplo versionado e gera PNG e HTML com os quatro gráficos e os números do resumo. Tem 4 testes. | Dar mensagem de erro mais clara quando o JSON editado à mão perde campos internos. | Baixa |
-| Testes unitários do aplicativo | 37 testes em 9 arquivos cobrem carrinho, formatação, armazenamento, cliente da API, componentes e a tela de login. Nos módulos do escopo da meta a cobertura é 63,3 % de linhas, acima dos 60 % previstos (o `src/` inteiro, com as telas, fica em 31,3 %). | Escrever testes de unidade para as telas sem cobertura (Carrinho, Checkout, Pedidos, Perfil, Cadastro, Endereços). | Média |
-| Testes da API | 46 testes (regras, assinatura do webhook, relatório e integração). Cobertura por arquivo entre 87,4 % e 100 % de linhas, acima da meta de 70 %. | Cobrir os ramos de `server.js` ainda sem teste (65,8 % de ramos). | Baixa |
+| Testes unitários do aplicativo | 39 testes em 9 arquivos cobrem carrinho, formatação, armazenamento, cliente da API, componentes e a tela de login. Nos módulos do escopo da meta a cobertura é 65,8 % de linhas, acima dos 60 % previstos (o `src/` inteiro, com as telas, fica em 32,1 %). | Escrever testes de unidade para as telas sem cobertura (Carrinho, Checkout, Pedidos, Perfil, Cadastro, Endereços). | Média |
+| Testes da API | 47 testes (regras, assinatura do webhook, relatório e integração). Cobertura por arquivo entre 87,4 % e 100 % de linhas, acima da meta de 70 %. | Cobrir os ramos de `server.js` ainda sem teste (65,8 % de ramos). | Baixa |
 | Testes E2E | 6 testes em cerca de 31 segundos, na build web contra a API real em banco temporário: compra até o checkout, administração de produtos, exportação, acesso restrito. Não chegam ao Mercado Pago. | Avaliar E2E em emulador Android se o grupo tiver tempo. | Média |
 | CI | Quatro jobs configurados, um por camada. Ainda não rodou no GitHub. | Conferir a primeira execução no pull request, em especial o Python 3.12 do dashboard. | Alta |
 | DER e `schema.sql` | Reescritos a partir de `backend/src/db.js` (seis tabelas, preços em centavos). Um teste compara o `schema.sql` com o banco criado de verdade. | Manter o teste: qualquer tabela nova no `db.js` exige atualizar o `schema.sql`. | Média |

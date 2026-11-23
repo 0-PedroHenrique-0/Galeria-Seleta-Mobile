@@ -156,7 +156,9 @@ SECOES = [
             }),
             ("p0", "Escopo funcional do produto:"),
             ("lista", [
-                "Cadastro, login e recuperação de senha.",
+                "Cadastro e login. A recuperação de senha existe só como interface: as telas "
+                "de pedir o código e redefinir a senha estão prontas, mas não há serviço por "
+                "trás delas — nenhuma chama a API.",
                 "Home, navegação por abas, listagem, busca e filtros de produtos.",
                 "Detalhe do produto, com tamanho, estoque e preço promocional.",
                 "Carrinho com alteração de quantidade e remoção de itens.",
@@ -765,12 +767,12 @@ SECOES = [
                      "os quatro gráficos e os números do resumo. Ação (baixa): mensagem de erro mais "
                      "clara quando o JSON editado à mão perde campos internos."],
                     ["Testes de unidade do aplicativo",
-                     "37 testes em 9 arquivos cobrem carrinho, formatação, armazenamento, cliente da "
+                     "39 testes em 9 arquivos cobrem carrinho, formatação, armazenamento, cliente da "
                      "API, componentes e a tela de login. Ação (média): escrever testes de unidade "
                      "para as telas sem cobertura (Carrinho, Checkout, Pedidos, Perfil, Cadastro e "
                      "Endereços)."],
                     ["Testes da API",
-                     "46 testes entre regras, assinatura do webhook, relatório e integração, com "
+                     "47 testes entre regras, assinatura do webhook, relatório e integração, com "
                      "cobertura por arquivo entre 87,4 % e 100 % de linhas. Ação (baixa): cobrir os "
                      "ramos do servidor ainda sem teste."],
                     ["Testes de ponta a ponta",
@@ -830,8 +832,8 @@ SECOES = [
                      "Dashboard em Python: lê o JSON e gera PNG e HTML com quatro gráficos e o "
                      "resumo. Quatro testes passam."],
                     ["2.6", "Concluído, com ressalvas",
-                     "93 testes passam. Cobertura da API acima da meta; a do aplicativo, no escopo "
-                     "definido, em 63,3 % de linhas. Integração contínua configurada, ainda não "
+                     "96 testes passam. Cobertura da API acima da meta; a do aplicativo, no escopo "
+                     "definido, em 65,8 % de linhas. Integração contínua configurada, ainda não "
                      "executada no GitHub."],
                     ["2.7", "Pendente do grupo",
                      "Roteiro do pitch definido no item 2.7. A gravação com todos os integrantes "
@@ -866,13 +868,16 @@ SECOES = [
                 ],
             }),
             ("p", "Percentual do backlog concluído (estimativa, a confirmar pelo grupo). O backlog "
-                  "da Sprint 1 tem 16 itens, PB01 a PB16, somando 82 Story Points, todos entregues: "
-                  "82 de 82 pontos, ou 100 %. A mudança de arquitetura da Sprint 2 alterou onde o "
-                  "catálogo vive, não o resultado entregue. Os itens da Sprint 2 não receberam "
-                  "pontos; por contagem de itens, são 6 de 8 concluídos no repositório (2.1 a 2.6), "
-                  "1 concluído nesta documentação (2.8) e 1 pendente do grupo (2.7) — 87,5 % por "
-                  "item, sem ponderar esforço. Os dois percentuais dependem de o grupo concordar com "
-                  "o que conta como concluído."),
+                  "da Sprint 1 tem 16 itens, PB01 a PB16, somando 82 Story Points. Quinze estão "
+                  "entregues por inteiro: 79 de 82 pontos, ou 96,3 %. Os 3 pontos que faltam são o "
+                  "PB11, a recuperação de senha, entregue em parte: as telas existem e navegam "
+                  "entre si, mas nenhuma chama a API, de modo que não há envio de código por "
+                  "e-mail, conferência do código nem gravação da nova senha. A mudança de "
+                  "arquitetura da Sprint 2 alterou onde o catálogo vive, não o resultado entregue. "
+                  "Os itens da Sprint 2 não receberam pontos; por contagem de itens, são 7 de 8 "
+                  "concluídos no repositório — 2.1 a 2.6 e o 2.8, que é esta documentação — e 1 "
+                  "pendente do grupo (2.7): 87,5 % por item, sem ponderar esforço. Os dois "
+                  "percentuais dependem de o grupo concordar com o que conta como concluído."),
         ],
     },
 
@@ -893,7 +898,7 @@ SECOES = [
                 "Entre as Sprints: pedidos e Checkout Pro do Mercado Pago, na API e no aplicativo, "
                 "com o primeiro teste de integração.",
                 "Sprint 2 (novembro): relatório de vendas em JSON, botão de exportar, dashboard em "
-                "Python, 93 testes automatizados em quatro camadas, workflow de integração contínua "
+                "Python, 96 testes automatizados em quatro camadas, workflow de integração contínua "
                 "com quatro jobs, DER e script SQL corrigidos, correção do botão de excluir na web e "
                 "os documentos de plano de testes, Sprint Review, status, encerramento e esta "
                 "documentação final.",
@@ -918,10 +923,12 @@ SECOES = [
                     ["PB08", "Busca e filtros", "5", "Sim", "a confirmar"],
                     ["PB09", "Endereços", "5", "Sim", "a confirmar"],
                     ["PB10", "Pedidos", "5", "Sim", "a confirmar"],
-                    ["PB11", "Recuperação de senha", "3", "Sim", "a confirmar"],
+                    ["PB11", "Recuperação de senha", "3", "Parcial — fluxo de telas, sem "
+                     "back-end", "a confirmar"],
                     ["PB12", "DER e script SQL", "5", "Sim, corrigido na Sprint 2", "a confirmar"],
                     ["PB13", "API Node inicial", "8", "Sim", "a confirmar"],
-                    ["PB14", "SQLite local", "5", "Sim, substituído pela API", "a confirmar"],
+                    ["PB14", "SQLite local", "5", "Sim na Sprint 1; hoje o banco é o da API, "
+                     "não há banco local no aplicativo", "a confirmar"],
                     ["PB15", "Wireframes e fluxo", "3", "Sim", "a confirmar"],
                     ["PB16", "Riscos e status", "3", "Sim", "a confirmar"],
                     ["", "Total", "82", "", ""],
@@ -981,7 +988,7 @@ SECOES = [
                 "arquivos do aparelho foram simulados nos testes; o plano de testes diz com clareza "
                 "o que isso deixa sem verificação.",
                 "Cobertura mede o que se instrumenta. A cobertura do aplicativo no escopo da meta "
-                "ficou em 63,3 % de linhas, e os testes de ponta a ponta, que exercitam a maioria "
+                "ficou em 65,8 % de linhas, e os testes de ponta a ponta, que exercitam a maioria "
                 "das telas, não entram na medição. Número baixo não significa tela sem teste, mas "
                 "também não prova que está coberta.",
                 "Registrar o esforço enquanto acontece. Para esforço real e participação isso não "
@@ -1043,12 +1050,12 @@ SECOES = [
                 "pesos": [1.3, 1.1, 1.1, 0.5, 0.6],
                 "linhas": [
                     ["Unitária do aplicativo", "Jest e Testing Library", "tests/unit (9 arquivos)",
-                     "37", "passam"],
+                     "39", "passam"],
                     ["Unitária e de integração da API", "node:test com SQLite temporário",
-                     "backend/test (5 arquivos)", "46", "passam"],
+                     "backend/test (5 arquivos)", "47", "passam"],
                     ["Ponta a ponta", "Playwright na build web", "tests/e2e", "6", "passam"],
                     ["Dashboard em Python", "unittest", "dashboard/", "4", "passam"],
-                    ["Total", "", "", "93", "passam"],
+                    ["Total", "", "", "96", "passam"],
                 ],
             }),
             ("p", "Os seis testes de ponta a ponta levam cerca de 31 segundos e rodam contra a API "
@@ -1107,10 +1114,10 @@ SECOES = [
                     ["API", "87,4 % a 100 % por arquivo",
                      "Meta de 70 % atingida. Relatório e regras em 100 %; o servidor, com 87,4 % de "
                      "linhas, é o menor."],
-                    ["Aplicativo, escopo da meta", "63,3 %",
+                    ["Aplicativo, escopo da meta", "65,8 %",
                      "Meta de 60 % atingida. Módulos de carrinho, armazenamento, cliente da API, "
                      "exportação e componentes."],
-                    ["Aplicativo, pasta src inteira", "31,3 %",
+                    ["Aplicativo, pasta src inteira", "32,1 %",
                      "Só informação: inclui as telas, que nunca estiveram no escopo da meta."],
                 ],
             }),
@@ -1268,11 +1275,11 @@ SECOES = [
                   "transforma em painel. As duas Sprints do roteiro foram cumpridas, e os itens 1.1 "
                   "a 1.6 foram revisados nesta entrega, com as correções do que mudou desde "
                   "setembro."),
-            ("p", "O que sustenta essa afirmação são 93 testes automatizados em quatro camadas, "
-                  "todos passando: 37 de unidade no aplicativo, 46 na API, 6 de ponta a ponta na "
+            ("p", "O que sustenta essa afirmação são 96 testes automatizados em quatro camadas, "
+                  "todos passando: 39 de unidade no aplicativo, 47 na API, 6 de ponta a ponta na "
                   "build web contra a API real e 4 no dashboard. A cobertura de linhas ficou acima "
                   "da meta nas duas partes em que a meta foi escrita: a API entre 87,4 % e 100 % por "
-                  "arquivo, e os módulos do aplicativo no escopo definido em 63,3 %. Dois defeitos "
+                  "arquivo, e os módulos do aplicativo no escopo definido em 65,8 %. Dois defeitos "
                   "reais apareceram por causa dos testes e foram corrigidos: o botão de excluir "
                   "produto, que não fazia nada no navegador, e o modelo de dados, que descrevia "
                   "tabelas inexistentes."),
@@ -1681,7 +1688,7 @@ SECOES = [
                     ["2.4 Encerramento e lições aprendidas", "Item 2.4", "Atendido"],
                     ["2.5 Dashboard em Python", "Item 2.5, Anexo A e Anexo C", "Atendido"],
                     ["2.6 Testes unitários, de integração e E2E", "Item 2.6",
-                     "Atendido: 93 testes passam"],
+                     "Atendido: 96 testes passam"],
                     ["2.7 Pitch de demonstração", "Item 2.7",
                      "Roteiro pronto; gravação pendente do grupo"],
                     ["2.8 Requisitos da entrega", "Item 2.8",

@@ -43,6 +43,6 @@ O estoque é reservado por 72 horas ao criar a preferência. Pedidos não pagos 
 
 ## Testes
 
-`npm test` executa um teste local com API do Mercado Pago simulada. Para homologação real, use credenciais e compradores de teste, confira cartões aprovados/recusados, Pix/boleto pendente, retorno por deep link e o simulador de Webhooks do painel. Segundo a documentação do Mercado Pago, pagamentos criados com credenciais de teste não enviam notificações reais.
+`npm test` (ou `npm run test:api` na raiz) executa os 47 testes locais da API, em cinco arquivos de `test/` — regras de negócio, autenticação e sessão, CRUD de produtos, checkout, assinatura do webhook, relatório de vendas e conferência do `schema.sql` —, sempre em banco SQLite temporário e com a API do Mercado Pago simulada. Para homologação real, use credenciais e compradores de teste, confira cartões aprovados/recusados, Pix/boleto pendente, retorno por deep link e o simulador de Webhooks do painel. Segundo a documentação do Mercado Pago, pagamentos criados com credenciais de teste não enviam notificações reais.
 
 Referências: [preferências](https://www.mercadopago.com.br/developers/pt/docs/checkout-pro-preferences/create-payment-preference), [Expo](https://www.mercadopago.com.br/developers/pt/docs/checkout-pro-preferences/mobile-integration/react-native-expo-go), [webhooks](https://www.mercadopago.com.br/developers/pt/docs/checkout-pro-preferences/payment-notifications).

@@ -12,7 +12,7 @@ Fecha as duas Sprints do PI IV: o que foi entregue, o esforço estimado contra o
 - relatório de vendas em JSON na API (`GET /api/reports/sales`, só administrador);
 - botão de exportar esse JSON na tela Gerenciar produtos;
 - dashboard em Python que lê o arquivo e gera o painel em PNG e HTML;
-- 93 testes automatizados em quatro camadas (37 do aplicativo, 46 da API, 6 E2E e 4 do dashboard), todos passando;
+- 96 testes automatizados em quatro camadas (39 do aplicativo, 47 da API, 6 E2E e 4 do dashboard), todos passando;
 - workflow de CI com quatro jobs;
 - DER e `schema.sql` corrigidos para as seis tabelas reais;
 - correção do botão de excluir produto na build web;
@@ -36,17 +36,19 @@ O backlog da Sprint 1 foi estimado em Story Points por Planning Poker (esforço 
 | PB08 | Busca e filtros | 5 | Sim | a confirmar pelo grupo |
 | PB09 | Endereços | 5 | Sim | a confirmar pelo grupo |
 | PB10 | Pedidos | 5 | Sim | a confirmar pelo grupo |
-| PB11 | Recuperação de senha | 3 | Sim | a confirmar pelo grupo |
+| PB11 | Recuperação de senha | 3 | Parcial — fluxo de telas, sem back-end | a confirmar pelo grupo |
 | PB12 | DER e script SQL | 5 | Sim, corrigido na Sprint 2 | a confirmar pelo grupo |
 | PB13 | API Node inicial | 8 | Sim | a confirmar pelo grupo |
-| PB14 | SQLite local | 5 | Sim, substituído pela API na Sprint 2 | a confirmar pelo grupo |
+| PB14 | SQLite local | 5 | Sim na Sprint 1; hoje o aplicativo não tem banco local — o SQLite é o da API | a confirmar pelo grupo |
 | PB15 | Wireframes e fluxo | 3 | Sim | a confirmar pelo grupo |
 | PB16 | Relatório de riscos e status | 3 | Sim | a confirmar pelo grupo |
 | | **Total** | **82** | | |
 
 Itens da Sprint 2 (2.1 a 2.8): não foram pontuados em Story Points. Estimativa e esforço real: a confirmar pelo grupo.
 
-Dois desvios em relação ao planejado, ambos medidos pelo repositório: o catálogo saiu do SQLite dentro do aplicativo e passou a vir da API, e o modelo de dados do DER tinha de ser refeito porque descrevia tabelas que nunca existiram no banco real.
+Somando só o que está entregue por inteiro, são **79 de 82 pontos (96,3 %)**. Os 3 pontos restantes são o PB11: a recuperação de senha existe como interface — as três etapas de `ForgotPasswordScreen` avançam entre si e os campos são validados —, mas nenhuma tela chama a API. Não há envio de código por e-mail, conferência do código digitado nem gravação da nova senha; `ChangePasswordScreen` ainda avisa que a alteração "foi salva localmente", e nada é salvo. Entregar o PB11 por inteiro exige rota na API, token de redefinição com prazo e envio de e-mail; nada disso foi feito.
+
+Três desvios em relação ao planejado, todos medidos pelo repositório: o catálogo saiu do SQLite dentro do aplicativo e passou a vir da API, o modelo de dados do DER tinha de ser refeito porque descrevia tabelas que nunca existiram no banco real, e o PB11 ficou nas telas.
 
 ## Desempenho da equipe
 
@@ -71,7 +73,7 @@ Leitura: o código foi escrito por quatro dos oito integrantes, com a maior part
 2. **Teste na plataforma que o usuário usa.** O botão de excluir produto não fazia nada na web porque `Alert.alert` não funciona no react-native-web. Só apareceu quando o E2E tentou excluir pela interface. Quando um recurso depende da plataforma, o teste precisa cobrir cada uma.
 3. **Separar regra de rota.** Mover validação de produto, validação de endereço e cotação do carrinho para um módulo próprio na API permitiu testá-las sem servidor, de forma rápida e precisa.
 4. **Simulação tem limite e precisa ser declarada.** O Mercado Pago e o sistema de arquivos do aparelho foram simulados nos testes. É um bom compromisso para o prazo, mas o plano de testes diz com clareza o que isso deixa sem verificação.
-5. **Cobertura mede o que se instrumenta.** A cobertura do aplicativo no escopo da meta ficou em 63,3 % de linhas (31,3 % no `src/` inteiro, que inclui as telas) e o E2E, que exercita a maioria das telas, não entra na medição. Número baixo não significa tela sem teste, mas também não prova que está coberta.
+5. **Cobertura mede o que se instrumenta.** A cobertura do aplicativo no escopo da meta ficou em 65,8 % de linhas (32,1 % no `src/` inteiro, que inclui as telas) e o E2E, que exercita a maioria das telas, não entra na medição. Número baixo não significa tela sem teste, mas também não prova que está coberta.
 6. **Registrar o esforço enquanto acontece.** A Sprint 1 pediu evidências durante o desenvolvimento, e para esforço real e participação isso não aconteceu: hoje o estimado contra o real e o trabalho fora do código dependem da memória do grupo.
 7. **Distribuir o código.** Quatro integrantes sem commits é um risco de projeto e de avaliação. Em uma próxima Sprint, cada integrante deve ter pelo menos uma tarefa de código ou de teste atribuída desde o planejamento.
 8. **Validar os requisitos do roteiro antes de congelar a arquitetura**, lição da Sprint 1 que continuou valendo: a mudança do catálogo local para a API é parte do mesmo problema.
