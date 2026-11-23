@@ -23,6 +23,17 @@ const EMPTY_FORM = {
   categoryId: CATEGORIES[0].id,
 };
 
+// Alert.alert não faz nada na web (react-native-web); lá a confirmação é o window.confirm.
+export function confirmar(titulo: string, mensagem: string): Promise<boolean> {
+  if (Platform.OS === 'web') return Promise.resolve(window.confirm(mensagem));
+  return new Promise(resolve => {
+    Alert.alert(titulo, mensagem, [
+      { text: 'Cancelar', style: 'cancel', onPress: () => resolve(false) },
+      { text: 'Excluir', style: 'destructive', onPress: () => resolve(true) },
+    ], { cancelable: true, onDismiss: () => resolve(false) });
+  });
+}
+
 export function ProductAdminScreen({ navigation }: any) {
   const [products, setProducts] = useState<Product[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -131,23 +142,12 @@ export function ProductAdminScreen({ navigation }: any) {
     }
   }
 
-  function remove(product: Product) {
-    Alert.alert(
-      'Excluir produto',
-      `Deseja excluir “${product.name}”?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: async () => {
-            await deleteProduct(product.id);
-            if (editingId === product.id) clearForm();
-            await load();
-          },
-        },
-      ],
-    );
+  async function remove(product: Product) {
+    const confirmado = await confirmar('Excluir produto', `Deseja excluir “${product.name}”?`);
+    if (!confirmado) return;
+    await deleteProduct(product.id);
+    if (editingId === product.id) clearForm();
+    await load();
   }
 
   return (
@@ -216,16 +216,16 @@ export function ProductAdminScreen({ navigation }: any) {
 
         <View style={styles.list}>
           {products.map(product => (
-            <View key={product.id} style={styles.productRow}>
+            <View key={product.id} testID="produto-linha" style={styles.productRow}>
               <View style={styles.productInfo}>
                 <Text style={styles.productName}>{product.name}</Text>
                 <Text style={styles.productMeta}>{product.category} · estoque {product.stock}</Text>
                 <Text style={styles.productPrice}>{money(product.price)}</Text>
               </View>
-              <Pressable onPress={() => edit(product)} style={styles.iconButton} hitSlop={8}>
+              <Pressable testID="produto-editar" onPress={() => edit(product)} style={styles.iconButton} hitSlop={8}>
                 <Ionicons name="create-outline" size={20} color={theme.colors.text} />
               </Pressable>
-              <Pressable onPress={() => remove(product)} style={styles.iconButton} hitSlop={8}>
+              <Pressable testID="produto-excluir" onPress={() => remove(product)} style={styles.iconButton} hitSlop={8}>
                 <Ionicons name="trash-outline" size={20} color={theme.colors.error} />
               </Pressable>
             </View>

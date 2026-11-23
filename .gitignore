@@ -7,3 +7,5 @@ dist/
 backend/data/
 dashboard/saida/
 __pycache__/
+playwright-report/
+test-results/

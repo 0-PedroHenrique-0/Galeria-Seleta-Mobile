@@ -37,7 +37,7 @@ export function Header({ navigation, onSearch, showSearch = true }: {
           </Pressable>
 
           <View style={styles.right}>
-            <Pressable onPress={() => go('Cart')} hitSlop={10} style={styles.iconButton}>
+            <Pressable testID="header-carrinho" onPress={() => go('Cart')} hitSlop={10} style={styles.iconButton}>
               <Ionicons name="bag-outline" size={23} color={theme.colors.text} />
               {cartCount > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{cartCount > 99 ? '99+' : cartCount}</Text></View>}
             </Pressable>
