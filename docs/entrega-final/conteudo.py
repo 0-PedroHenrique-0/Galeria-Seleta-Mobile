@@ -718,7 +718,7 @@ SECOES = [
                   "com a data de Brasília. No navegador o arquivo é baixado; no aparelho ele é "
                   "gravado na pasta de documentos do aplicativo e, se houver compartilhamento "
                   "disponível, a folha de compartilhamento é aberta."),
-            ("p", "O código das duas partes está no Anexo A. A tela com o botão é a Figura B.7. O "
+            ("p", "O código das duas partes está no Anexo A. A tela com o botão é a Figura B.8. O "
                   "caminho do navegador é exercitado por teste de ponta a ponta, que confere que o "
                   "arquivo baixado é um JSON com resumo; o caminho do aparelho só foi exercitado com "
                   "o módulo de arquivos simulado, conforme declarado no item 2.6."),
@@ -936,27 +936,32 @@ SECOES = [
                   "grupo."),
             ("tabela", {
                 "titulo": "Quadro 18 — Participação por integrante, conforme o repositório",
-                "cabecalho": ["Integrante", "Commits", "Contribuição"],
-                "pesos": [1.5, 0.7, 2.0],
+                "cabecalho": ["Integrante", "Commits (aprox.)", "Contribuição"],
+                "pesos": [1.5, 0.9, 1.9],
                 "linhas": [
-                    ["Pedro Henrique Teixeira Silva", "5",
-                     "Criou o projeto e o aplicativo base; faz o merge dos pull requests. Os commits "
-                     "estão em duas contas que o grupo atribui à mesma pessoa."],
-                    ["Gustavo Oliveira Fernandes de Andrade", "29",
+                    ["Pedro Henrique Teixeira Silva", "5 de conteúdo, mais 2 merges",
+                     "Criou o projeto e o aplicativo base; faz o merge dos pull requests. Os "
+                     "commits de conteúdo estão em duas contas que o grupo atribui à mesma pessoa; "
+                     "quem contar no GitHub vê sete, porque os dois merges também contam."],
+                    ["Gustavo Oliveira Fernandes de Andrade", "cerca de 30",
                      "Sprint 1: catálogo vindo do banco, CRUD de produtos, DER, script SQL, API Node "
                      "inicial, integração contínua e captura de evidências."],
-                    ["Vinicius Soares Inocencio", "6",
+                    ["Vinicius Soares Inocencio", "cerca de 6",
                      "Pedidos e Checkout Pro do Mercado Pago, na API e no aplicativo, e o primeiro "
                      "teste de integração."],
-                    ["Leandro Sato", "11",
+                    ["Leandro Sato", "mais de 10, ainda crescendo",
                      "Sprint 2: testes das três camadas, relatório em JSON, dashboard e "
-                     "documentação."],
+                     "documentação. É o único número que continua subindo, porque os commits que "
+                     "geram e corrigem este documento também são dele."],
                     ["Eduardo Campos Medeiros", "0", "Sem commits no repositório."],
                     ["João Pedro Cavanhas Colombo", "0", "Sem commits no repositório."],
                     ["Ryan Silva Santos", "0", "Sem commits no repositório."],
                     ["Nicolas Thomaz Pinheiro", "0", "Sem commits no repositório."],
                 ],
             }),
+            ("nota", "A contagem foi feita no repositório durante a escrita desta documentação e é "
+                     "aproximada de propósito: o número exato muda a cada commit. Commit de merge "
+                     "não é trabalho de conteúdo, mas aparece no total que o GitHub mostra."),
             ("p", "Leitura honesta do quadro: o código foi escrito por quatro dos oito integrantes, "
                   "com a maior parte do histórico da Sprint 1 em um só. Qualquer contribuição dos "
                   "outros quatro integrantes fora do repositório precisa ser registrada pelo grupo "
@@ -1212,8 +1217,14 @@ SECOES = [
         "nivel": 2,
         "blocos": [
             ("p", "O roteiro define o que a entrega final precisa conter e como ela é enviada: "
-                  "somente pelo Blackboard, em arquivo único compactado. O quadro abaixo relaciona "
-                  "cada exigência com o lugar em que ela está atendida."),
+                  "somente pelo Blackboard, em arquivo único compactado."),
+            ("p", "Antes de enviar, o grupo ainda precisa gravar o pitch conforme o roteiro do item "
+                  "2.7, compactar o projeto inteiro em um único arquivo, com este PDF incluído, e "
+                  "enviar pelo Blackboard dentro do prazo. O PDF e o programa que o gera estão "
+                  "versionados no repositório, em docs/entrega-final/, para que o pacote seja um "
+                  "só."),
+            ("p", "O quadro abaixo relaciona cada exigência com o lugar em que ela está "
+                  "atendida."),
             ("tabela", {
                 "titulo": "Quadro 23 — Exigências da entrega e onde elas estão",
                 "cabecalho": ["Exigência do roteiro", "Onde está", "Situação"],
@@ -1227,13 +1238,13 @@ SECOES = [
                     ["Tudo o que já foi entregue", "Itens 1.1 a 1.6, revisados, e itens 2.1 a 2.8",
                      "Atendido"],
                     ["Código e telas do aplicativo", "Anexo A (código) e Anexo B (sete telas em "
-                                                     "execução)", "Atendido"],
+                                                     "oito figuras)", "Atendido"],
                     ["Código e telas do dashboard", "Anexo A (código) e Anexo C (painel gerado)",
                      "Atendido"],
                     ["Mínimo de seis telas", "Anexo B: Home, Produtos, detalhe, sacola, login, "
                                              "checkout e Gerenciar produtos", "Atendido"],
-                    ["Cadastro com inserir, alterar, excluir e consultar", "Item 2.1 e Figura B.7; "
-                                                                           "coberto por teste",
+                    ["Cadastro com inserir, alterar, excluir e consultar", "Item 2.1 e Figuras B.7 e "
+                                                                           "B.8; coberto por teste",
                      "Atendido"],
                     ["Carrinho de compras", "Item 2.1 e Figura B.4", "Atendido"],
                     ["Pitch", "Item 2.7 traz o roteiro", "Pendente: gravação do grupo"],
@@ -1241,10 +1252,6 @@ SECOES = [
                                        "e este PDF", "Pendente: compactar e enviar"],
                 ],
             }),
-            ("p", "O que o grupo precisa fazer antes de enviar: gravar o pitch conforme o roteiro do "
-                  "item 2.7, compactar o projeto inteiro em um único arquivo, com este PDF incluído, "
-                  "e enviar pelo Blackboard dentro do prazo. O PDF e o programa que o gera estão "
-                  "versionados no repositório, em docs/entrega-final/, para que o pacote seja um só."),
         ],
     },
 
@@ -1310,12 +1317,15 @@ SECOES = [
                     "sqlite.html. Acesso em: 23 nov. 2026."),
             ("ref", "EXPRESS. Guia da API. Disponível em: https://expressjs.com/. Acesso em: 23 nov. "
                     "2026."),
-            ("ref", "MERCADO PAGO. Checkout Pro: criar preferência de pagamento. Disponível em: "
-                    "https://www.mercadopago.com.br/developers/pt/docs/checkout-pro-preferences/"
-                    "create-payment-preference. Acesso em: 23 nov. 2026."),
-            ("ref", "MERCADO PAGO. Notificações de pagamento (webhooks). Disponível em: "
-                    "https://www.mercadopago.com.br/developers/pt/docs/checkout-pro-preferences/"
-                    "payment-notifications. Acesso em: 23 nov. 2026."),
+            # A quebra de linha antes da URL evita que ela se parta no meio do domínio.
+            ("ref", "MERCADO PAGO. Checkout Pro: criar preferência de pagamento. Disponível em:\n"
+                    "https://www.mercadopago.com.br/developers/pt/docs/\n"
+                    "checkout-pro-preferences/create-payment-preference.\n"
+                    "Acesso em: 23 nov. 2026."),
+            ("ref", "MERCADO PAGO. Notificações de pagamento (webhooks). Disponível em:\n"
+                    "https://www.mercadopago.com.br/developers/pt/docs/\n"
+                    "checkout-pro-preferences/payment-notifications.\n"
+                    "Acesso em: 23 nov. 2026."),
             ("ref", "JEST. Documentação oficial. Disponível em: https://jestjs.io/. Acesso em: 23 "
                     "nov. 2026."),
             ("ref", "PLAYWRIGHT. Documentação oficial. Disponível em: https://playwright.dev/. "
@@ -1366,6 +1376,10 @@ SECOES = [
                     "  const porDia = db.prepare(`SELECT date(o.created_at, '-03:00') AS data,",
                     "    COUNT(*) AS pedidos, SUM(o.total_cents) AS cents",
                     "    FROM orders o WHERE ${approved} GROUP BY data ORDER BY data ASC`).all(...args);",
+                    "",
+                    "  // ... as consultas de itens, de categorias, de status e de produtos seguem o",
+                    "  // mesmo padrão e estão no arquivo completo.",
+                    "  ...",
                     "",
                     "  return {",
                     "    geradoEm: new Date().toISOString(),",
@@ -1554,16 +1568,34 @@ SECOES = [
                     "    texto = f\"{valor:,.2f}\"",
                     "    return \"R$ \" + texto.replace(\",\", \"@\").replace(\".\", \",\").replace(\"@\", \".\")",
                     "",
-                    "def gerar(relatorio, destino):",
-                    "    \"\"\"Gera dashboard.png e dashboard.html na pasta de destino.\"\"\"",
-                    "    destino.mkdir(parents=True, exist_ok=True)",
-                    "    figura, eixos = plt.subplots(2, 2, figsize=(16, 10), facecolor=FUNDO)",
+                    "def montar_figura(relatorio):",
+                    "    # Figura pequena de propósito: impressa no documento final, cada ponto de fonte",
+                    "    # daqui vale cerca de 0,6 ponto no papel, e nada pode sair abaixo de 6 pontos.",
+                    "    figura, eixos = plt.subplots(2, 2, figsize=(10, 7.2), facecolor=FUNDO)",
+                    "    figura.subplots_adjust(top=0.76, bottom=0.14, left=0.13, right=0.97,",
+                    "                           hspace=0.55, wspace=0.42)",
+                    "    desenhar_cabecalho(figura, relatorio)",
                     "    grafico_faturamento_por_dia(eixos[0][0], relatorio[\"porDia\"])",
                     "    grafico_ranking_de_produtos(eixos[0][1], relatorio[\"produtos\"])",
-                    "    grafico_por_categoria(eixos[1][0], relatorio[\"porCategoria\"])",
-                    "    grafico_por_status(eixos[1][1], relatorio[\"porStatus\"])",
-                    "    ...",
-                    "    return {\"png\": png, \"html\": html}",
+                    "    grafico_vendas_por_categoria(eixos[1][0], relatorio[\"porCategoria\"])",
+                    "    grafico_pedidos_por_status(eixos[1][1], relatorio[\"porStatus\"])",
+                    "    figura.text(0.03, 0.015, textwrap.fill(AVISO_FRETE, 95),",
+                    "                color=TEXTO_SECUNDARIO, fontsize=10, va=\"bottom\", linespacing=1.4)",
+                    "    return figura",
+                    "",
+                    "def gerar(relatorio, destino):",
+                    "    \"\"\"Cria dashboard.png e dashboard.html em `destino` e devolve os caminhos.\"\"\"",
+                    "    destino = Path(destino)",
+                    "    destino.mkdir(parents=True, exist_ok=True)",
+                    "    caminho_png = destino / \"dashboard.png\"",
+                    "    caminho_html = destino / \"dashboard.html\"",
+                    "",
+                    "    figura = montar_figura(relatorio)",
+                    "    figura.savefig(caminho_png, dpi=160, facecolor=FUNDO)",
+                    "    plt.close(figura)",
+                    "",
+                    "    caminho_html.write_text(montar_html(relatorio, caminho_png), encoding=\"utf-8\")",
+                    "    return {\"png\": caminho_png, \"html\": caminho_html}",
                 ],
             }),
         ],
@@ -1575,7 +1607,9 @@ SECOES = [
         "blocos": [
             ("p", "As figuras abaixo foram capturadas automaticamente da build web do aplicativo, em "
                   "largura de celular (390 pontos), com a API respondendo em banco temporário. São "
-                  "as telas reais em execução, não maquetes. O programa que as captura está em "
+                  "as telas reais em execução, não maquetes. São oito figuras de sete telas: a "
+                  "tela Gerenciar produtos, por ser alta, aparece em duas, o formulário de cadastro "
+                  "e a lista do catálogo com o botão de exportar. O programa que as captura está em "
                   "scripts/capturar-telas.mjs."),
             ("imagem", {"arquivo": "img/01-home.png", "altura_cm": 17.0,
                         "legenda": "Figura B.1 — Home: identidade visual, busca, navegação superior "
@@ -1595,9 +1629,15 @@ SECOES = [
             ("imagem", {"arquivo": "img/06-checkout.png", "altura_cm": 17.0,
                         "legenda": "Figura B.6 — Checkout: endereço, opções de frete, resumo com "
                                    "total calculado pela API e pagamento pelo Mercado Pago."}),
-            ("imagem", {"arquivo": "img/07-gerenciar-produtos.png", "altura_cm": 17.0,
-                        "legenda": "Figura B.7 — Gerenciar produtos: formulário do CRUD, cartão de "
-                                   "dados de vendas com o botão de exportar e a lista do catálogo."}),
+            ("imagem", {"arquivo": "img/07-gerenciar-cadastro.png", "altura_cm": 17.0,
+                        "legenda": "Figura B.7 — Gerenciar produtos, topo da tela: formulário de "
+                                   "cadastro usado para inserir um produto e, ao tocar no lápis da "
+                                   "lista, para alterar o produto escolhido."}),
+            ("imagem", {"arquivo": "img/08-gerenciar-lista.png", "altura_cm": 17.0,
+                        "legenda": "Figura B.8 — Gerenciar produtos, mesma tela mais abaixo: cartão "
+                                   "de dados de vendas com o botão de exportar e a lista do "
+                                   "catálogo, em que cada produto traz os botões de alterar e "
+                                   "excluir."}),
         ],
     },
 
@@ -1608,7 +1648,9 @@ SECOES = [
             ("p", "O painel abaixo foi gerado pelo programa em Python a partir do arquivo de exemplo "
                   "versionado no repositório, cujos dados são fictícios. O mesmo programa gera uma "
                   "versão em HTML, com os números do resumo em texto, útil para leitura na tela."),
-            ("imagem", {"arquivo": "img/08-dashboard.png", "altura_cm": 10.9,
+            # 11,5 cm de altura dão 16 cm de largura, a mancha inteira: na figura o menor texto
+            # tem 10 pontos e, nessa escala, chega ao papel com mais de 6.
+            ("imagem", {"arquivo": "img/09-dashboard.png", "altura_cm": 11.5,
                         "legenda": "Figura C.1 — Painel de vendas: faturamento por dia, ranking de "
                                    "produtos, vendas por categoria e pedidos por estado de "
                                    "pagamento, com o resumo no cabeçalho."}),
@@ -1634,7 +1676,7 @@ SECOES = [
                      "Atendido, com o modelo corrigido"],
                     ["1.6 Status, riscos e Sprint Review", "Item 1.6", "Atendido"],
                     ["2.1 CRUD e integração com a API", "Item 2.1 e Anexo A", "Atendido"],
-                    ["2.2 Gerar dados em JSON", "Item 2.2, Anexo A e Figura B.7", "Atendido"],
+                    ["2.2 Gerar dados em JSON", "Item 2.2, Anexo A e Figura B.8", "Atendido"],
                     ["2.3 Sprint Review e relatório de status", "Item 2.3", "Atendido"],
                     ["2.4 Encerramento e lições aprendidas", "Item 2.4", "Atendido"],
                     ["2.5 Dashboard em Python", "Item 2.5, Anexo A e Anexo C", "Atendido"],
@@ -1644,8 +1686,8 @@ SECOES = [
                      "Roteiro pronto; gravação pendente do grupo"],
                     ["2.8 Requisitos da entrega", "Item 2.8",
                      "Atendido; falta compactar e enviar"],
-                    ["Mínimo de seis telas", "Anexo B: sete telas", "Atendido"],
-                    ["CRUD completo de cadastro", "Item 2.1, Figura B.7 e testes do CA-07",
+                    ["Mínimo de seis telas", "Anexo B: sete telas em oito figuras", "Atendido"],
+                    ["CRUD completo de cadastro", "Item 2.1, Figuras B.7 e B.8 e testes do CA-07",
                      "Atendido"],
                     ["Carrinho de compras", "Item 2.1 e Figura B.4", "Atendido"],
                     ["Integração com o Mercado Pago", "Item 2.1",

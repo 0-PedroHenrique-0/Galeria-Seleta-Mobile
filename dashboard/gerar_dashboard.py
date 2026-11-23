@@ -11,6 +11,7 @@ import argparse
 import base64
 import html
 import json
+import textwrap
 from pathlib import Path
 
 import matplotlib
@@ -74,8 +75,8 @@ def texto_do_periodo(periodo):
 
 def estilizar_eixo(eixo, titulo):
     eixo.set_facecolor(SUPERFICIE)
-    eixo.set_title(titulo, color=TEXTO, fontsize=11, loc="left", pad=10)
-    eixo.tick_params(colors=TEXTO_SECUNDARIO, labelsize=9)
+    eixo.set_title(titulo, color=TEXTO, fontsize=12, loc="left", pad=10)
+    eixo.tick_params(colors=TEXTO_SECUNDARIO, labelsize=10)
     for lado in ("top", "right"):
         eixo.spines[lado].set_visible(False)
     for lado in ("left", "bottom"):
@@ -84,7 +85,7 @@ def estilizar_eixo(eixo, titulo):
 
 def avisar_sem_dados(eixo):
     eixo.text(0.5, 0.5, "Sem vendas no período", color=TEXTO_SECUNDARIO,
-              ha="center", va="center", transform=eixo.transAxes, fontsize=11)
+              ha="center", va="center", transform=eixo.transAxes, fontsize=12)
     eixo.set_xticks([])
     eixo.set_yticks([])
 
@@ -100,6 +101,7 @@ def grafico_faturamento_por_dia(eixo, por_dia):
     eixo.plot(tabela["data"], tabela["faturamento"], color=ACENTO,
               marker="o", markersize=4, linewidth=2)
     eixo.fill_between(tabela["data"], tabela["faturamento"], color=ACENTO, alpha=0.15)
+    eixo.xaxis.set_major_locator(mdates.AutoDateLocator(maxticks=6))
     eixo.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
     eixo.set_ylabel("R$", color=TEXTO_SECUNDARIO)
     eixo.grid(axis="y", color=TEXTO_SECUNDARIO, alpha=0.25)
@@ -116,8 +118,8 @@ def grafico_ranking_de_produtos(eixo, produtos):
     valores = [p["faturamento"] for p in ordenados]
     barras = eixo.barh(nomes, valores, color=ACENTO)
     eixo.bar_label(barras, labels=[moeda(v) for v in valores],
-                   color=TEXTO, fontsize=8, padding=3)
-    eixo.set_xlim(0, max(valores) * 1.3 if max(valores) > 0 else 1)
+                   color=TEXTO, fontsize=10, padding=3)
+    eixo.set_xlim(0, max(valores) * 1.35 if max(valores) > 0 else 1)
 
 
 def grafico_vendas_por_categoria(eixo, categorias):
@@ -129,9 +131,9 @@ def grafico_vendas_por_categoria(eixo, categorias):
     valores = [c["faturamento"] for c in categorias]
     barras = eixo.bar(nomes, valores, color=ACENTO)
     eixo.bar_label(barras, labels=[moeda(v) for v in valores],
-                   color=TEXTO, fontsize=8, padding=3)
+                   color=TEXTO, fontsize=10, padding=4, rotation=90)
     eixo.tick_params(axis="x", labelrotation=20)
-    eixo.set_ylim(0, max(valores) * 1.2 if max(valores) > 0 else 1)
+    eixo.set_ylim(0, max(valores) * 2.0 if max(valores) > 0 else 1)  # espaço para o rótulo em pé
 
 
 def grafico_pedidos_por_status(eixo, status):
@@ -144,7 +146,7 @@ def grafico_pedidos_por_status(eixo, status):
     valores = [s["pedidos"] for s in ordenados]
     barras = eixo.barh(nomes, valores, color=ACENTO)
     eixo.bar_label(barras, labels=[str(v) for v in valores],
-                   color=TEXTO, fontsize=9, padding=3)
+                   color=TEXTO, fontsize=10, padding=3)
     eixo.set_xlim(0, max(valores) * 1.2 if max(valores) > 0 else 1)
 
 
@@ -168,22 +170,24 @@ def desenhar_cabecalho(figura, relatorio):
     largura = 0.94 / len(indicadores)
     for posicao, (rotulo, valor) in enumerate(indicadores):
         x = 0.03 + posicao * largura
-        figura.text(x, 0.905, rotulo, color=TEXTO_SECUNDARIO, fontsize=9, va="top")
+        figura.text(x, 0.905, rotulo, color=TEXTO_SECUNDARIO, fontsize=10, va="top")
         figura.text(x, 0.88, valor, color=ACENTO, fontsize=15,
                     fontweight="bold", va="top")
 
 
 def montar_figura(relatorio):
-    figura, eixos = plt.subplots(2, 2, figsize=(14, 10), facecolor=FUNDO)
-    figura.subplots_adjust(top=0.78, bottom=0.12, left=0.12, right=0.97,
-                           hspace=0.45, wspace=0.35)
+    # Figura pequena de propósito: impressa no documento final, cada ponto de fonte daqui
+    # vale cerca de 0,6 ponto no papel, e nenhum texto pode sair abaixo de 6 pontos.
+    figura, eixos = plt.subplots(2, 2, figsize=(10, 7.2), facecolor=FUNDO)
+    figura.subplots_adjust(top=0.76, bottom=0.14, left=0.13, right=0.97,
+                           hspace=0.55, wspace=0.42)
     desenhar_cabecalho(figura, relatorio)
     grafico_faturamento_por_dia(eixos[0][0], relatorio["porDia"])
     grafico_ranking_de_produtos(eixos[0][1], relatorio["produtos"])
     grafico_vendas_por_categoria(eixos[1][0], relatorio["porCategoria"])
     grafico_pedidos_por_status(eixos[1][1], relatorio["porStatus"])
-    figura.text(0.03, 0.025, AVISO_FRETE, color=TEXTO_SECUNDARIO, fontsize=8,
-                va="bottom")
+    figura.text(0.03, 0.015, textwrap.fill(AVISO_FRETE, 95), color=TEXTO_SECUNDARIO,
+                fontsize=10, va="bottom", linespacing=1.4)
     return figura
 
 
@@ -243,7 +247,7 @@ def gerar(relatorio, destino):
     caminho_html = destino / "dashboard.html"
 
     figura = montar_figura(relatorio)
-    figura.savefig(caminho_png, dpi=110, facecolor=FUNDO)
+    figura.savefig(caminho_png, dpi=160, facecolor=FUNDO)
     plt.close(figura)
 
     caminho_html.write_text(montar_html(relatorio, caminho_png), encoding="utf-8")

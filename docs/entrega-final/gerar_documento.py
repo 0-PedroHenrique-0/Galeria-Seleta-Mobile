@@ -122,7 +122,10 @@ def largura_util():
 
 
 def paragrafo(texto, estilo, **extras):
-    return Paragraph(escape(texto), ESTILOS[estilo], **extras)
+    # Uma quebra de linha no texto vira <br/>: serve para a referência bibliográfica
+    # não partir a URL no meio do domínio.
+    marcado = escape(texto).replace(chr(10), "<br/>")
+    return Paragraph(marcado, ESTILOS[estilo], **extras)
 
 
 class Documento(BaseDocTemplate):

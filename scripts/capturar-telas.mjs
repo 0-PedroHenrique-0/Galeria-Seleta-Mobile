@@ -199,17 +199,19 @@ async function main() {
   await ativo(paginaAdmin, 'Meu perfil').waitFor({ state: 'visible', timeout: 30000 });
   await clicar(paginaAdmin, 'Gerenciar produtos');
   await ativo(paginaAdmin, 'DADOS DE VENDAS').waitFor({ state: 'visible', timeout: 30000 });
-  // Desce até o cartão de exportação, para a tela mostrar o botão inteiro e a lista de produtos.
-  await paginaAdmin.mouse.wheel(0, 760);
-  await fotografar(paginaAdmin, '07-gerenciar-produtos');
+  // Duas fotos: o formulário de cadastro no topo da tela...
+  await fotografar(paginaAdmin, '07-gerenciar-cadastro');
+  // ...e, mais abaixo, o cartão de exportação inteiro com a lista do catálogo.
+  await paginaAdmin.mouse.wheel(0, 745);
+  await fotografar(paginaAdmin, '08-gerenciar-lista');
 
   await navegador.close();
 
   // O painel do dashboard fica em pasta ignorada pelo git; o documento usa esta cópia versionada.
   const painel = join(RAIZ, 'dashboard', 'saida', 'dashboard.png');
   if (existsSync(painel)) {
-    copyFileSync(painel, join(DESTINO, '08-dashboard.png'));
-    console.log('copiada: 08-dashboard.png');
+    copyFileSync(painel, join(DESTINO, '09-dashboard.png'));
+    console.log('copiada: 09-dashboard.png');
   } else {
     console.log('AVISO: dashboard/saida/dashboard.png não existe. Rode o dashboard antes.');
   }

@@ -39,7 +39,7 @@ npm run capturar:telas
 
 O primeiro comando gera o painel do dashboard (a pasta `dashboard/saida/` é ignorada pelo Git, por
 isso o script copia o PNG para `img/`). O segundo sobe a API, gera a build web, serve o site,
-fotografa as sete telas e copia o painel. Depois disso, gere o PDF de novo.
+fotografa as sete telas (a de Gerenciar produtos em duas fotos) e copia o painel. Depois disso, gere o PDF de novo.
 
 ## O que o teste confere
 

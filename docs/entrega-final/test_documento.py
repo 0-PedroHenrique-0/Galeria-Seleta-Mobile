@@ -218,9 +218,9 @@ class EstruturaTest(unittest.TestCase):
     def test_anexos_trazem_as_telas_do_aplicativo_e_do_dashboard(self):
         paginas = ler_paginas()
         imagens = sum(pagina["imagens"] for pagina in paginas)
-        self.assertGreaterEqual(imagens, 8, "faltam telas do aplicativo ou o painel do dashboard nos anexos")
+        self.assertGreaterEqual(imagens, 9, "faltam telas do aplicativo ou o painel do dashboard nos anexos")
         texto = texto_inteiro()
-        for figura in ("Figura B.1", "Figura B.7", "Figura C.1"):
+        for figura in ("Figura B.1", "Figura B.7", "Figura B.8", "Figura C.1"):
             self.assertIn(figura, texto, f"legenda ausente: {figura}")
 
 
