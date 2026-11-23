@@ -192,3 +192,32 @@ test('reconciliação com pagamento que não corresponde devolve 409', async () 
   assert.equal(response.status, 409);
   assert.equal((await call(`/api/orders/${created.body.orderId}`, 'GET', null, token)).body.paymentStatus, 'AGUARDANDO_PAGAMENTO');
 });
+
+test('relatório sem token devolve 401 e com token de cliente comum devolve 403', async () => {
+  assert.equal((await call('/api/reports/sales')).status, 401);
+  const { token } = await signup('relatorio-comum@example.com');
+  assert.equal((await call('/api/reports/sales', 'GET', null, token)).status, 403);
+});
+
+test('administrador recebe o relatório com resumo, porDia, porCategoria, porStatus e produtos', async () => {
+  const response = await call('/api/reports/sales', 'GET', null, await adminToken());
+  assert.equal(response.status, 200);
+  for (const chave of ['geradoEm', 'periodo', 'resumo', 'porDia', 'porCategoria', 'porStatus', 'produtos']) assert.ok(chave in response.body, chave);
+  assert.deepEqual(response.body.periodo, { de: null, ate: null });
+  assert.equal(typeof response.body.resumo.ticketMedio, 'number');
+});
+
+test('from depois de to devolve 400 com mensagem', async () => {
+  const response = await call('/api/reports/sales?from=2026-11-12&to=2026-11-10', 'GET', null, await adminToken());
+  assert.equal(response.status, 400);
+  assert.ok(response.body.message);
+});
+
+test('data em formato inválido devolve 400', async () => {
+  const token = await adminToken();
+  for (const query of ['from=ontem', 'to=2026-02-31']) {
+    const response = await call(`/api/reports/sales?${query}`, 'GET', null, token);
+    assert.equal(response.status, 400);
+    assert.ok(response.body.message);
+  }
+});

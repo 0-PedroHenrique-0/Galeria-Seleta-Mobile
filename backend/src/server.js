@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { db, transaction, productToApi, getOrder, releaseReservation, expireReservations } from './db.js';
 import { register, login, requireUser, requireAdmin, publicUser } from './auth.js';
 import { HttpError, toCents, validateProduct, validateAddress, quote } from './rules.js';
+import { salesReport } from './reports.js';
 import { createPreference, getPayment, searchPayments, verifyWebhook } from './mercado-pago.js';
 
 const app = express();
@@ -164,6 +165,7 @@ app.post('/api/orders/:id/reconcile', requireUser, asyncRoute(async (req, res) =
   if (!await reconcilePayment(paymentId)) throw new HttpError(409, 'Pagamento não corresponde ao pedido.');
   res.json(getOrder(order.id));
 }));
+app.get('/api/reports/sales', requireUser, requireAdmin, (req, res) => res.json(salesReport(db, { from: req.query.from, to: req.query.to })));
 app.post('/api/webhooks/mercado-pago', asyncRoute(async (req, res) => {
   if (!verifyWebhook(req.headers, req.query)) return res.status(401).end();
   if (req.query.type !== 'payment') return res.status(200).end();

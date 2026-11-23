@@ -35,6 +35,7 @@ No app, configure `EXPO_PUBLIC_API_URL` com o endereço da API alcançável pelo
 - `POST /api/checkout/quote` e `POST /api/checkout/sessions`
 - `GET /api/orders`, `GET /api/orders/:id`, `POST /api/orders/:id/reconcile`
 - `POST /api/webhooks/mercado-pago`
+- `GET /api/reports/sales?from=&to=` (somente administrador): relatório de vendas em JSON (período opcional, `AAAA-MM-DD`, inclusivo). Alimenta o dashboard da disciplina de Análise de Dados. `resumo.faturamento` e `porDia` somam o total pago pelo cliente, frete incluído; `porCategoria` e `produtos` somam só o valor das peças, sem frete. Datas e dias seguem o horário de Brasília (UTC-3).
 
 Pedidos e cotações são calculados a partir dos preços no banco do servidor. A sessão de checkout usa `idempotencyKey` para reaproveitar a preferência em tentativas repetidas. O webhook verifica a assinatura HMAC, consulta o pagamento na API do Mercado Pago e compara referência, moeda e valor antes de atualizar o pedido. O retorno por deep link não aprova a compra por si só.
 
