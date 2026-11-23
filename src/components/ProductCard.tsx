@@ -3,7 +3,7 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Product } from '../types';
 import { theme } from '../theme';
 
-const money = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+import { money } from '../cart';
 
 export function ProductCard({ product, onPress, compact = false }: { product: Product; onPress?: () => void; compact?: boolean }) {
   const finalPrice = product.discountPrice ?? product.price;

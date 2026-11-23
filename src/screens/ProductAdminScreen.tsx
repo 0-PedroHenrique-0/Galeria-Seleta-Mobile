@@ -8,6 +8,7 @@ import { Field } from '../components/Field';
 import { CATEGORIES } from '../data';
 import { createProduct, deleteProduct, getProducts, ProductInput, updateProduct } from '../database';
 import { Product } from '../types';
+import { money } from '../cart';
 import { theme } from '../theme';
 
 const EMPTY_FORM = {
@@ -193,7 +194,7 @@ export function ProductAdminScreen({ navigation }: any) {
               <View style={styles.productInfo}>
                 <Text style={styles.productName}>{product.name}</Text>
                 <Text style={styles.productMeta}>{product.category} · estoque {product.stock}</Text>
-                <Text style={styles.productPrice}>{product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
+                <Text style={styles.productPrice}>{money(product.price)}</Text>
               </View>
               <Pressable onPress={() => edit(product)} style={styles.iconButton} hitSlop={8}>
                 <Ionicons name="create-outline" size={20} color={theme.colors.text} />

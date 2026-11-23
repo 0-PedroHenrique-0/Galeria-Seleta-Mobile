@@ -8,7 +8,7 @@ import { createCheckout, quoteApi } from '../api';
 import { Address, CartItem } from '../types';
 import { theme } from '../theme';
 
-const money = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+import { money } from '../cart';
 const newKey = () => `checkout-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
 
 export function CheckoutScreen({ navigation }: any) {

@@ -9,7 +9,7 @@ import { saveCart } from '../storage';
 import { Order } from '../types';
 import { theme } from '../theme';
 
-const money = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+import { money } from '../cart';
 export function OrderDetailScreen({ route, navigation }: any) {
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState('');

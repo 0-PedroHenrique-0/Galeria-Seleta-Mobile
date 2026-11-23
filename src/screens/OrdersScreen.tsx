@@ -6,7 +6,7 @@ import { getOrdersApi } from '../api';
 import { Order } from '../types';
 import { theme } from '../theme';
 
-const money = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+import { money } from '../cart';
 export function OrdersScreen({ navigation }: any) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [error, setError] = useState('');

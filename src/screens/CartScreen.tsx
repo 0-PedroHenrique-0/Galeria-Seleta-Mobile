@@ -9,17 +9,14 @@ import { CartItem } from '../types';
 import { getCart, saveCart } from '../storage';
 import { theme } from '../theme';
 
-const money = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+import { money, cartSubtotal, changeQuantity, removeItem } from '../cart';
 export function CartScreen({ navigation }: any) {
   const [items, setItems] = useState<CartItem[]>([]);
   useFocusEffect(useCallback(() => { getCart().then(setItems); }, []));
   async function update(next: CartItem[]) { setItems(next); await saveCart(next); }
-  const change = (id: number, size: string | undefined, delta: number) =>
-    update(items.map(item => item.id === id && item.size === size
-      ? { ...item, quantity: Math.max(1, Math.min(item.stock, item.quantity + delta)) } : item));
-  const remove = (id: number, size: string | undefined) =>
-    update(items.filter(item => !(item.id === id && item.size === size)));
-  const subtotal = items.reduce((sum, item) => sum + (item.discountPrice ?? item.price) * item.quantity, 0);
+  const change = (id: number, size: string | undefined, delta: number) => update(changeQuantity(items, id, size, delta));
+  const remove = (id: number, size: string | undefined) => update(removeItem(items, id, size));
+  const subtotal = cartSubtotal(items);
   return <Screen><Header navigation={navigation} onSearch={() => navigation.navigate('Search')}/><View style={styles.page}>
     <Text style={styles.title}>Sacola de compras</Text>
     {!items.length ? <View style={styles.empty}>
