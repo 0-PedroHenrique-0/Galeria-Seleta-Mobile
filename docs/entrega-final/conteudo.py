@@ -934,9 +934,10 @@ SECOES = [
                     ["", "Total", "82", "", ""],
                 ],
             }),
-            ("p", "Dois desvios em relação ao planejado, ambos medidos pelo repositório: o catálogo "
-                  "saiu do SQLite dentro do aplicativo e passou a vir da API, e o modelo de dados "
-                  "teve de ser refeito porque descrevia tabelas que nunca existiram no banco real."),
+            ("p", "Três desvios em relação ao planejado, todos medidos pelo repositório: o catálogo "
+                  "saiu do SQLite dentro do aplicativo e passou a vir da API, o modelo de dados "
+                  "teve de ser refeito porque descrevia tabelas que nunca existiram no banco real, "
+                  "e o PB11 ficou nas telas, sem back-end."),
             ("p", "Desempenho da equipe. A contagem abaixo vem do histórico do repositório. Commit "
                   "mede apenas trabalho de código e documentação versionados: reunião, pesquisa e "
                   "escrita fora do repositório não aparecem aqui e devem ser acrescentadas pelo "
@@ -1272,10 +1273,13 @@ SECOES = [
                   "monta a sacola, informa o endereço, vê o total calculado no servidor e é levado "
                   "ao Checkout Pro do Mercado Pago; o administrador mantém o catálogo pelo próprio "
                   "aplicativo e exporta os dados de vendas em JSON, que o dashboard em Python "
-                  "transforma em painel. As duas Sprints do roteiro foram cumpridas, e os itens 1.1 "
-                  "a 1.6 foram revisados nesta entrega, com as correções do que mudou desde "
-                  "setembro."),
-            ("p", "O que sustenta essa afirmação são 96 testes automatizados em quatro camadas, "
+                  "transforma em painel. As duas Sprints do roteiro foram percorridas até o fim, "
+                  "com uma ressalva que o Quadro 17 registra: 79 dos 82 Story Points do backlog da "
+                  "Sprint 1 estão entregues por inteiro, e os 3 restantes são a recuperação de "
+                  "senha, que ficou no fluxo de telas, sem back-end. Os itens 1.1 a 1.6 foram "
+                  "revisados nesta entrega, com as correções do que mudou desde setembro, e o item "
+                  "2.7, o pitch, depende de gravação do grupo."),
+            ("p", "O que sustenta essa leitura são 96 testes automatizados em quatro camadas, "
                   "todos passando: 39 de unidade no aplicativo, 47 na API, 6 de ponta a ponta na "
                   "build web contra a API real e 4 no dashboard. A cobertura de linhas ficou acima "
                   "da meta nas duas partes em que a meta foi escrita: a API entre 87,4 % e 100 % por "
