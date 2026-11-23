@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../components/Screen';
@@ -7,6 +7,8 @@ import { Button } from '../components/Button';
 import { Field } from '../components/Field';
 import { CATEGORIES } from '../data';
 import { createProduct, deleteProduct, getProducts, ProductInput, updateProduct } from '../database';
+import { getSalesReportApi } from '../api';
+import { exportSalesReport } from '../reportExport';
 import { Product } from '../types';
 import { money } from '../cart';
 import { theme } from '../theme';
@@ -27,6 +29,9 @@ export function ProductAdminScreen({ navigation }: any) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState('');
+  const [exportedFile, setExportedFile] = useState('');
 
   const load = useCallback(async () => {
     try { setProducts(await getProducts()); }
@@ -113,6 +118,19 @@ export function ProductAdminScreen({ navigation }: any) {
     }
   }
 
+  async function exportData() {
+    setExporting(true);
+    setExportError('');
+    setExportedFile('');
+    try {
+      setExportedFile(await exportSalesReport(await getSalesReportApi()));
+    } catch (e) {
+      setExportError(e instanceof Error ? e.message : 'Não foi possível exportar os dados.');
+    } finally {
+      setExporting(false);
+    }
+  }
+
   function remove(product: Product) {
     Alert.alert(
       'Excluir produto',
@@ -183,6 +201,14 @@ export function ProductAdminScreen({ navigation }: any) {
           </View>
         </View>
 
+        <View style={styles.exportCard}>
+          <Text style={styles.sectionTitle}>DADOS DE VENDAS</Text>
+          <Text style={styles.exportHint}>Gera um arquivo JSON com o resumo das vendas, para o dashboard.</Text>
+          {exportError ? <Text style={styles.error}>{exportError}</Text> : null}
+          {exportedFile ? <Text style={styles.exportDone}>Arquivo gerado: {exportedFile}{Platform.OS === 'web' ? '' : ' (salvo na pasta de documentos do app)'}</Text> : null}
+          {exporting ? <Text style={styles.exportHint}>Gerando arquivo...</Text> : <Button label="EXPORTAR DADOS (JSON)" secondary onPress={exportData} />}
+        </View>
+
         <View style={styles.listHeader}>
           <Text style={styles.sectionTitle}>PRODUTOS CADASTRADOS</Text>
           <Text style={styles.count}>{products.length} item{products.length === 1 ? '' : 's'}</Text>
@@ -228,6 +254,9 @@ const styles = StyleSheet.create({
   column: { flex: 1 },
   actions: { gap: 8 },
   error: { color: theme.colors.error, fontSize: 11, marginBottom: 14 },
+  exportCard: { backgroundColor: theme.colors.surface, borderRadius: 9, padding: 16, marginTop: 16, gap: 10 },
+  exportHint: { color: theme.colors.muted, fontSize: 11 },
+  exportDone: { color: theme.colors.text, fontSize: 11 },
   listHeader: { marginTop: 28, marginBottom: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   count: { color: theme.colors.muted, fontSize: 10 },
   list: { gap: 9 },

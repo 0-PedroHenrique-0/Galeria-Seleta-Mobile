@@ -53,6 +53,10 @@ A API inicia em `http://localhost:3333`. Configure `backend/.env` antes de execu
 - `docs/Sprint-1/DER.md` — Diagrama Entidade-Relacionamento.
 - `backend/` — API, banco SQLite, autenticação e pagamentos.
 
+## Exportar dados de vendas
+
+Em Perfil, Gerenciar produtos (só para administrador), o botão **EXPORTAR DADOS (JSON)** busca o relatório em `GET /api/reports/sales` e gera o arquivo `vendas-galeria-seleta-AAAA-MM-DD.json`. Na web ele é baixado pelo navegador; no celular é salvo e aberto no compartilhamento do sistema. Esse arquivo alimenta o dashboard em `dashboard/`.
+
 ## Persistência
 
 O banco SQLite da API fica em `backend/data/galeria.sqlite` por padrão. O catálogo inicial é copiado de `backend/src/catalog.json`. O arquivo `database/schema.sql` e os documentos da Sprint 1 registram a estrutura anterior do projeto.

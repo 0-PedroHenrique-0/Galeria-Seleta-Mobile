@@ -48,3 +48,14 @@ export const getOrderApi = (id: string) => request<Order>(`/api/orders/${encodeU
 export const reconcileOrderApi = (id: string, paymentId: string) => request<Order>(`/api/orders/${encodeURIComponent(id)}/reconcile`, {
   method: 'POST', body: JSON.stringify({ paymentId }),
 });
+
+export type SalesReport = {
+  geradoEm: string;
+  periodo: { de: string | null; ate: string | null };
+  resumo: { pedidos: number; faturamento: number; ticketMedio: number; itensVendidos: number; clientes: number };
+  porDia: { data: string; pedidos: number; faturamento: number }[];
+  porCategoria: { categoria: string; itens: number; faturamento: number }[];
+  porStatus: { status: string; pedidos: number }[];
+  produtos: { id: number; nome: string; itens: number; faturamento: number }[];
+};
+export const getSalesReportApi = () => request<SalesReport>('/api/reports/sales');
