@@ -5,3 +5,5 @@ dist/
 .env.*
 .npm-cache/
 backend/data/
+dashboard/saida/
+__pycache__/

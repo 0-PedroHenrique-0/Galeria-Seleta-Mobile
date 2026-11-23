@@ -1,0 +1,211 @@
+{
+  "geradoEm": "2026-11-23T12:00:00.000Z",
+  "periodo": {
+    "de": "2026-10-24",
+    "ate": "2026-11-22"
+  },
+  "resumo": {
+    "pedidos": 24,
+    "faturamento": 9283.3,
+    "ticketMedio": 386.8,
+    "itensVendidos": 58,
+    "clientes": 17
+  },
+  "porDia": [
+    {
+      "data": "2026-10-24",
+      "pedidos": 1,
+      "faturamento": 319.8
+    },
+    {
+      "data": "2026-10-25",
+      "pedidos": 1,
+      "faturamento": 729.6
+    },
+    {
+      "data": "2026-10-26",
+      "pedidos": 2,
+      "faturamento": 709.4
+    },
+    {
+      "data": "2026-10-28",
+      "pedidos": 1,
+      "faturamento": 519.7
+    },
+    {
+      "data": "2026-10-30",
+      "pedidos": 1,
+      "faturamento": 299.7
+    },
+    {
+      "data": "2026-10-31",
+      "pedidos": 1,
+      "faturamento": 609.6
+    },
+    {
+      "data": "2026-11-04",
+      "pedidos": 2,
+      "faturamento": 889.4
+    },
+    {
+      "data": "2026-11-05",
+      "pedidos": 2,
+      "faturamento": 689.4
+    },
+    {
+      "data": "2026-11-06",
+      "pedidos": 1,
+      "faturamento": 159.8
+    },
+    {
+      "data": "2026-11-07",
+      "pedidos": 1,
+      "faturamento": 159.8
+    },
+    {
+      "data": "2026-11-08",
+      "pedidos": 1,
+      "faturamento": 159.8
+    },
+    {
+      "data": "2026-11-09",
+      "pedidos": 1,
+      "faturamento": 399.7
+    },
+    {
+      "data": "2026-11-11",
+      "pedidos": 2,
+      "faturamento": 1339.3
+    },
+    {
+      "data": "2026-11-13",
+      "pedidos": 1,
+      "faturamento": 399.8
+    },
+    {
+      "data": "2026-11-15",
+      "pedidos": 1,
+      "faturamento": 159.8
+    },
+    {
+      "data": "2026-11-18",
+      "pedidos": 1,
+      "faturamento": 169.8
+    },
+    {
+      "data": "2026-11-19",
+      "pedidos": 1,
+      "faturamento": 399.8
+    },
+    {
+      "data": "2026-11-20",
+      "pedidos": 1,
+      "faturamento": 419.7
+    },
+    {
+      "data": "2026-11-22",
+      "pedidos": 2,
+      "faturamento": 749.4
+    }
+  ],
+  "porCategoria": [
+    {
+      "categoria": "Calças",
+      "itens": 26,
+      "faturamento": 3497.4
+    },
+    {
+      "categoria": "Moletons",
+      "itens": 15,
+      "faturamento": 2248.5
+    },
+    {
+      "categoria": "Calçados",
+      "itens": 7,
+      "faturamento": 979.3
+    },
+    {
+      "categoria": "Shorts",
+      "itens": 3,
+      "faturamento": 899.7
+    },
+    {
+      "categoria": "Camisetas",
+      "itens": 4,
+      "faturamento": 879.6
+    },
+    {
+      "categoria": "Jaquetas",
+      "itens": 3,
+      "faturamento": 599.7
+    }
+  ],
+  "porStatus": [
+    {
+      "status": "APROVADO",
+      "pedidos": 24
+    },
+    {
+      "status": "AGUARDANDO_PAGAMENTO",
+      "pedidos": 5
+    },
+    {
+      "status": "RECUSADO",
+      "pedidos": 3
+    },
+    {
+      "status": "EM_ANALISE",
+      "pedidos": 2
+    }
+  ],
+  "produtos": [
+    {
+      "id": 1,
+      "nome": "Moletom Oversized",
+      "itens": 15,
+      "faturamento": 2248.5
+    },
+    {
+      "id": 8,
+      "nome": "Calça Jeans Clássica",
+      "itens": 12,
+      "faturamento": 1678.8
+    },
+    {
+      "id": 4,
+      "nome": "Calça Cargo",
+      "itens": 7,
+      "faturamento": 1119.3
+    },
+    {
+      "id": 5,
+      "nome": "Tênis Skate",
+      "itens": 7,
+      "faturamento": 979.3
+    },
+    {
+      "id": 6,
+      "nome": "Shorts Esportivo",
+      "itens": 3,
+      "faturamento": 899.7
+    },
+    {
+      "id": 3,
+      "nome": "Camiseta Oversized",
+      "itens": 4,
+      "faturamento": 879.6
+    },
+    {
+      "id": 2,
+      "nome": "Calça Jeans Wide",
+      "itens": 7,
+      "faturamento": 699.3
+    },
+    {
+      "id": 7,
+      "nome": "Jaqueta Coach",
+      "itens": 3,
+      "faturamento": 599.7
+    }
+  ]
+}
