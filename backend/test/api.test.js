@@ -221,3 +221,22 @@ test('data em formato inválido devolve 400', async () => {
     assert.ok(response.body.message);
   }
 });
+
+test('schema.sql cobre as tabelas do banco real', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { DatabaseSync } = await import('node:sqlite');
+  const referencia = new DatabaseSync(':memory:');
+  referencia.exec(readFileSync(new URL('../../database/schema.sql', import.meta.url), 'utf8'));
+  const tabelas = sql => sql.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all().map(t => t.name);
+  const colunas = (sql, tabela) => sql.prepare(`PRAGMA table_info(${tabela})`).all().map(c => ({ name: c.name, type: c.type, notnull: c.notnull, dflt_value: c.dflt_value, pk: c.pk }));
+  const unicos = (sql, tabela) => sql.prepare(`PRAGMA index_list(${tabela})`).all().filter(i => i.unique)
+    .map(i => sql.prepare(`PRAGMA index_info(${i.name})`).all().map(c => c.name).join(',')).sort();
+  const chaves = (sql, tabela) => sql.prepare(`PRAGMA foreign_key_list(${tabela})`).all().map(f => `${f.from}->${f.table}.${f.to}`).sort();
+
+  assert.deepEqual(tabelas(referencia), tabelas(db));
+  for (const tabela of tabelas(db)) {
+    assert.deepEqual(colunas(referencia, tabela), colunas(db, tabela), `colunas de ${tabela}`);
+    assert.deepEqual(chaves(referencia, tabela), chaves(db, tabela), `chaves estrangeiras de ${tabela}`);
+    assert.deepEqual(unicos(referencia, tabela), unicos(db, tabela), `restrições UNIQUE de ${tabela}`);
+  }
+});
