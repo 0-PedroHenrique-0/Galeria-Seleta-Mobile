@@ -13,7 +13,7 @@ Situação de cada item da Sprint 2 do roteiro, com impedimentos e percentual do
 | 2.5 | Dashboard em Python | Concluído | `dashboard/`: lê o JSON e gera PNG e HTML com quatro gráficos e o resumo. 4 testes passam. |
 | 2.6 | Testes automatizados | Concluído, com ressalvas | 93 testes passam (37 do aplicativo, 46 da API, 6 E2E, 4 do dashboard). Cobertura da API acima da meta; a do aplicativo, no escopo da meta, é 63,3 % de linhas, acima dos 60 % previstos (31,3 % no `src/` inteiro, só informação). CI configurado, ainda não executado no GitHub. Detalhes em `PLANO-DE-TESTES.md`. |
 | 2.7 | Pitch | **Pendente do grupo** | Gravação do grupo com todos os integrantes; fora do que foi feito no repositório. |
-| 2.8 | Documento final em PDF | Em andamento | O PDF é gerado a partir destes documentos, na etapa seguinte. Conferência de formatação (fonte, margens, estrutura) pendente até o arquivo existir. |
+| 2.8 | Documento final em PDF | Concluído | `docs/entrega-final/`: PDF de 42 páginas gerado a partir destes documentos, com os itens 1.1 a 2.8, código, telas do aplicativo e painel do dashboard. Formatação conferida por `test_documento.py` e por leitura. Falta ao grupo compactar o projeto e enviar pelo Blackboard. |
 
 ## Impedimentos e riscos
 
