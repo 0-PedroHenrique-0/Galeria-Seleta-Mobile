@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { abrirApp, abrirSacolaPeloCabecalho, texto, adicionarProdutoNaSacola, cadastrar, emailUnico, irParaAba } from './apoio';
+import { abrirApp, abrirSacolaPeloCabecalho, texto, adicionarProdutoNaSacola, cadastrar, emailUnico } from './apoio';
 
 test('cliente comum não vê o atalho de gerenciar produtos no perfil', async ({ page }) => {
   await abrirApp(page);

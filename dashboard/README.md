@@ -31,8 +31,8 @@ embutido, então o arquivo é autossuficiente). A pasta `saida/` não vai para o
 python -I gerar_dashboard.py --entrada caminho/vendas.json --saida saida/
 ```
 
-Se faltar algum campo obrigatório (`resumo`, `porDia`, `porCategoria`,
-`porStatus` ou `produtos`), o programa para e diz qual.
+Se faltar algum campo obrigatório (`periodo`, `resumo`, `porDia`,
+`porCategoria`, `porStatus` ou `produtos`), o programa para e diz qual.
 
 ## Como ler os números
 

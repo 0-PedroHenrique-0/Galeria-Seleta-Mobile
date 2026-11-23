@@ -12,6 +12,12 @@ import { mkdirSync, copyFileSync, existsSync, readFileSync, globSync } from 'nod
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+// Seletores e fluxos vêm do mesmo módulo usado pelos testes de ponta a ponta:
+// um rótulo da interface que mudar é ajustado em um lugar só.
+import {
+  abrirSacolaPeloCabecalho, cadastrarEndereco, campo, clicar, entrarComoAdmin,
+  esperarVisivel, irParaAba, preencherCadastro,
+} from '../tests/e2e/fluxos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DESTINO = join(RAIZ, 'docs', 'entrega-final', 'img');
@@ -74,28 +80,9 @@ async function esperarNoAr(url, segundos = 180) {
   throw new Error(`Servidor não respondeu em ${segundos} s: ${url}`);
 }
 
-/** Texto visível na tela ativa: o React Navigation mantém as telas anteriores montadas. */
-const ativo = (pagina, texto) =>
-  pagina.getByText(texto, { exact: typeof texto === 'string' }).and(pagina.locator(':not([aria-hidden="true"] *)'));
-
-/** Campo pelo texto de exemplo, restrito à tela ativa (as telas anteriores seguem montadas). */
-const campo = (pagina, exemplo) =>
-  pagina.getByPlaceholder(exemplo).and(pagina.locator(':not([aria-hidden="true"] *)')).first();
-
-async function preencher(pagina, exemplo, valor) {
-  const alvo = campo(pagina, exemplo);
-  await alvo.waitFor({ state: 'visible', timeout: 30000 });
-  await alvo.fill(valor);
-}
-
-async function clicar(pagina, texto) {
-  const alvo = ativo(pagina, texto).first();
-  await alvo.waitFor({ state: 'visible', timeout: 30000 });
-  await alvo.click();
-}
-
+/** Troca de aba e espera a animação terminar antes da foto. */
 async function aba(pagina, nome) {
-  await pagina.getByRole('tab', { name: nome }).click();
+  await irParaAba(pagina, nome);
   await pagina.waitForTimeout(600);
 }
 
@@ -153,8 +140,7 @@ async function main() {
 
   await clicar(pagina, 'G');
   await clicar(pagina, 'ADICIONAR AO CARRINHO');
-  await pagina.getByTestId('header-carrinho').and(pagina.locator(':not([aria-hidden="true"] *)')).click();
-  await ativo(pagina, 'Sacola de compras').waitFor({ state: 'visible', timeout: 30000 });
+  await abrirSacolaPeloCabecalho(pagina);
   await fotografar(pagina, '04-carrinho');
 
   // A sacola foi aberta pelo cabeçalho, fora das abas: volta à raiz para seguir pelas abas.
@@ -165,40 +151,26 @@ async function main() {
   await campo(pagina, 'seu@email.com').waitFor({ state: 'visible', timeout: 30000 });
   await fotografar(pagina, '05-login');
 
-  // Cria a conta do cliente para chegar ao checkout com endereço.
+  // Cria a conta do cliente para chegar ao checkout com endereço. O formulário é
+  // aberto daqui, pela tela de login, e preenchido pelo fluxo compartilhado.
   await clicar(pagina, 'Criar uma conta');
-  await preencher(pagina, 'Seu nome', CLIENTE.nome);
-  await preencher(pagina, 'seu@email.com', CLIENTE.email);
-  await preencher(pagina, 'Mínimo 8 caracteres', CLIENTE.senha);
-  await preencher(pagina, 'Repita a senha', CLIENTE.senha);
-  await clicar(pagina, /Li e aceito os Termos de Uso/);
-  await clicar(pagina, 'CRIAR CONTA');
-  await ativo(pagina, 'Meu perfil').waitFor({ state: 'visible', timeout: 30000 });
+  await preencherCadastro(pagina, { nome: CLIENTE.nome, email: CLIENTE.email, senha: CLIENTE.senha });
 
-  await clicar(pagina, 'Meus endereços');
-  await clicar(pagina, 'ADICIONAR ENDEREÇO');
-  await preencher(pagina, 'Rua, número', 'Rua das Flores, 123');
-  await preencher(pagina, 'São Paulo', 'São Paulo');
-  await preencher(pagina, 'SP', 'SP');
-  await preencher(pagina, '00000-000', '01310100');
-  await clicar(pagina, 'SALVAR ENDEREÇO');
-  await clicar(pagina, 'VOLTAR');
+  await cadastrarEndereco(pagina);
 
   await aba(pagina, 'Carrinho');
   await clicar(pagina, 'FINALIZAR COMPRA');
-  await ativo(pagina, 'Finalizar compra').waitFor({ state: 'visible', timeout: 30000 });
+  await esperarVisivel(pagina, 'Finalizar compra');
   await fotografar(pagina, '06-checkout');
 
   // Administrador: tela de gerenciamento de produtos, com o botão de exportar.
   const paginaAdmin = await novaPagina(navegador);
-  await aba(paginaAdmin, 'Perfil');
-  await clicar(paginaAdmin, 'ENTRAR');
-  await preencher(paginaAdmin, 'seu@email.com', AMBIENTE_API.ADMIN_EMAIL);
-  await preencher(paginaAdmin, 'Sua senha', AMBIENTE_API.ADMIN_PASSWORD);
-  await clicar(paginaAdmin, 'ENTRAR');
-  await ativo(paginaAdmin, 'Meu perfil').waitFor({ state: 'visible', timeout: 30000 });
+  await entrarComoAdmin(paginaAdmin, {
+    email: AMBIENTE_API.ADMIN_EMAIL,
+    senha: AMBIENTE_API.ADMIN_PASSWORD,
+  });
   await clicar(paginaAdmin, 'Gerenciar produtos');
-  await ativo(paginaAdmin, 'DADOS DE VENDAS').waitFor({ state: 'visible', timeout: 30000 });
+  await esperarVisivel(paginaAdmin, 'DADOS DE VENDAS');
   // Duas fotos: o formulário de cadastro no topo da tela...
   await fotografar(paginaAdmin, '07-gerenciar-cadastro');
   // ...e, mais abaixo, o cartão de exportação inteiro com a lista do catálogo.

@@ -28,7 +28,7 @@ TEXTO = "#F2F2F0"
 TEXTO_SECUNDARIO = "#9A9895"
 ACENTO = "#E8441A"
 
-CAMPOS_OBRIGATORIOS = ("resumo", "porDia", "porCategoria", "porStatus", "produtos")
+CAMPOS_OBRIGATORIOS = ("periodo", "resumo", "porDia", "porCategoria", "porStatus", "produtos")
 
 NOMES_DE_STATUS = {
     "APROVADO": "Aprovado",

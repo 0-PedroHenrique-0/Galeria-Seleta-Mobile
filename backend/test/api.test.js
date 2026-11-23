@@ -1,5 +1,6 @@
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
+import { createHmac } from 'node:crypto';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -109,6 +110,16 @@ test('token com assinatura adulterada devolve 401', async () => {
   const tampered = `${payload}.${signature.slice(0, -1)}${swapped}`;
   assert.notEqual(tampered, token);
   assert.equal((await call('/api/me', 'GET', null, tampered)).status, 401);
+});
+
+test('token com assinatura válida e prazo vencido devolve 401 de sessão expirada', async () => {
+  const { user } = await signup('expirado@example.com');
+  // Token montado com o mesmo segredo do servidor: a assinatura confere, só o prazo venceu.
+  const payload = Buffer.from(JSON.stringify({ sub: user.id, exp: Date.now() - 1000 })).toString('base64url');
+  const assinatura = createHmac('sha256', process.env.AUTH_SECRET).update(payload).digest('base64url');
+  const response = await call('/api/me', 'GET', null, `${payload}.${assinatura}`);
+  assert.equal(response.status, 401);
+  assert.equal(response.body.message, 'Sessão expirada.');
 });
 
 test('catálogo lista os oito produtos iniciais com preço em reais', async () => {
