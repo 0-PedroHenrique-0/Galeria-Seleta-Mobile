@@ -1,49 +1,72 @@
+-- Galeria Seleta: modelo de dados.
+-- Este arquivo é a referência documental do banco. O banco de verdade é criado
+-- pelo próprio backend/src/db.js na primeira execução da API; um teste em
+-- backend/test/api.test.js confere que os dois descrevem as mesmas tabelas.
+-- Valores em dinheiro ficam em centavos (INTEGER), para não acumular erro de arredondamento.
+
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name VARCHAR(120) NOT NULL,
-  email VARCHAR(160) NOT NULL UNIQUE,
-  password_hash VARCHAR(255),
-  phone VARCHAR(30),
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS services (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name VARCHAR(120) NOT NULL,
-  description TEXT,
-  price DECIMAL(10, 2) NOT NULL DEFAULT 0,
-  active BOOLEAN NOT NULL DEFAULT 1,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  phone TEXT,
+  is_admin INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS products (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY,
   category_id INTEGER NOT NULL,
-  category VARCHAR(80) NOT NULL,
-  name VARCHAR(160) NOT NULL,
+  category TEXT NOT NULL,
+  name TEXT NOT NULL,
   description TEXT NOT NULL,
-  price DECIMAL(10, 2) NOT NULL CHECK (price >= 0),
-  discount_price DECIMAL(10, 2),
-  stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
+  price_cents INTEGER NOT NULL,
+  discount_price_cents INTEGER,
+  stock INTEGER NOT NULL,
+  image TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  idempotency_key TEXT NOT NULL,
+  address_json TEXT NOT NULL,
+  shipping_code TEXT NOT NULL,
+  subtotal_cents INTEGER NOT NULL,
+  shipping_cents INTEGER NOT NULL,
+  total_cents INTEGER NOT NULL,
+  payment_status TEXT NOT NULL,
+  fulfillment_status TEXT NOT NULL,
+  preference_id TEXT,
+  checkout_url TEXT,
+  reservation_expires_at TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE(user_id, idempotency_key)
+);
+
+CREATE TABLE IF NOT EXISTS order_items (
+  order_id TEXT NOT NULL REFERENCES orders(id),
+  product_id INTEGER NOT NULL,
+  name TEXT NOT NULL,
+  size TEXT NOT NULL,
+  quantity INTEGER NOT NULL,
+  unit_price_cents INTEGER NOT NULL,
   image TEXT NOT NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  PRIMARY KEY (order_id, product_id, size)
 );
 
-CREATE TABLE IF NOT EXISTS appointments (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER NOT NULL,
-  service_id INTEGER NOT NULL,
-  scheduled_at DATETIME NOT NULL,
-  status VARCHAR(30) NOT NULL DEFAULT 'AGENDADO',
-  notes TEXT,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (service_id) REFERENCES services(id)
+CREATE TABLE IF NOT EXISTS payments (
+  id TEXT PRIMARY KEY,
+  order_id TEXT NOT NULL REFERENCES orders(id),
+  status TEXT NOT NULL,
+  amount_cents INTEGER NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_appointments_user_id ON appointments(user_id);
-CREATE INDEX IF NOT EXISTS idx_appointments_service_id ON appointments(service_id);
-CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id);
+CREATE TABLE IF NOT EXISTS webhook_events (
+  id TEXT PRIMARY KEY,
+  received_at TEXT NOT NULL
+);

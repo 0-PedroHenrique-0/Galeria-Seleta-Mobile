@@ -3,66 +3,18 @@ import cors from 'cors';
 import { randomUUID } from 'node:crypto';
 import { db, transaction, productToApi, getOrder, releaseReservation, expireReservations } from './db.js';
 import { register, login, requireUser, requireAdmin, publicUser } from './auth.js';
+import { HttpError, toCents, validateProduct, validateAddress, quote } from './rules.js';
+import { salesReport } from './reports.js';
 import { createPreference, getPayment, searchPayments, verifyWebhook } from './mercado-pago.js';
 
 const app = express();
 const PORT = process.env.PORT || 3333;
 app.use(cors({ origin: process.env.APP_ORIGIN || true }));
 app.use(express.json({ limit: '32kb' }));
-class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
 const asyncRoute = fn => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
 const now = () => new Date().toISOString();
-const toCents = value => Number.isFinite(Number(value)) ? Math.round(Number(value) * 100) : NaN;
 const lastPaymentCheck = new Map();
-
-function validateProduct(body) {
-  const p = {
-    name: String(body?.name ?? '').trim(), category: String(body?.category ?? '').trim(),
-    description: String(body?.description ?? '').trim(), image: String(body?.image ?? '').trim(),
-    categoryId: Number(body?.categoryId), stock: Number(body?.stock), price: toCents(body?.price),
-    discount: body?.discountPrice == null || body.discountPrice === '' ? null : toCents(body.discountPrice),
-  };
-  if (!p.name || !p.category || !p.description || !p.image || !Number.isInteger(p.categoryId) || p.categoryId < 1 ||
-      !Number.isInteger(p.stock) || p.stock < 0 || !Number.isInteger(p.price) || p.price < 0 ||
-      (p.discount != null && (!Number.isInteger(p.discount) || p.discount < 0 || p.discount > p.price))) {
-    throw new HttpError(400, 'Dados do produto inválidos.');
-  }
-  return p;
-}
-
-function quote(body) {
-  if (!Array.isArray(body?.items) || body.items.length === 0 || body.items.length > 30) throw new HttpError(400, 'Carrinho inválido.');
-  const shippingCode = body.shippingCode;
-  const shippingCents = { standard: 2990, express: 5490 }[shippingCode];
-  if (!shippingCents) throw new HttpError(400, 'Frete inválido.');
-  const seen = new Set();
-  let subtotalCents = 0;
-  const items = body.items.map(input => {
-    const id = Number(input.id), quantity = Number(input.quantity), size = String(input.size ?? '').trim();
-    const key = `${id}:${size}`;
-    if (!Number.isInteger(id) || !Number.isInteger(quantity) || quantity < 1 || quantity > 20 ||
-        !['P', 'M', 'G', 'GG'].includes(size) || seen.has(key)) throw new HttpError(400, 'Item inválido no carrinho.');
-    seen.add(key);
-    const product = db.prepare('SELECT * FROM products WHERE id = ?').get(id);
-    if (!product || product.stock < quantity) throw new HttpError(409, 'Produto indisponível ou estoque insuficiente. Atualize o carrinho.');
-    const unitPriceCents = product.discount_price_cents ?? product.price_cents;
-    subtotalCents += unitPriceCents * quantity;
-    return { product_id: id, name: product.name, size, quantity, unit_price_cents: unitPriceCents, image: product.image };
-  });
-  return { items, shippingCode, subtotalCents, shippingCents, totalCents: subtotalCents + shippingCents };
-}
-
-function validateAddress(value) {
-  const address = {
-    street: String(value?.street ?? '').trim(), city: String(value?.city ?? '').trim(),
-    state: String(value?.state ?? '').trim().toUpperCase(), zip: String(value?.zip ?? '').replace(/\D/g, ''),
-    complement: String(value?.complement ?? '').trim(),
-  };
-  if (address.street.length < 5 || address.city.length < 2 || !/^[A-Z]{2}$/.test(address.state) || !/^\d{8}$/.test(address.zip) || address.zip === '00000000') {
-    throw new HttpError(400, 'Preencha um endereço de entrega válido.');
-  }
-  return address;
-}
+const findProduct = id => db.prepare('SELECT * FROM products WHERE id = ?').get(id);
 
 async function reconcilePayment(paymentId) {
   const payment = await getPayment(paymentId);
@@ -141,7 +93,7 @@ app.delete('/api/products/:id', requireUser, requireAdmin, (req, res) => {
   res.status(result.changes ? 204 : 404).end();
 });
 app.post('/api/checkout/quote', requireUser, (req, res) => {
-  const q = quote(req.body);
+  const q = quote(req.body, findProduct);
   res.json({ subtotal: q.subtotalCents / 100, shipping: q.shippingCents / 100, discount: 0, total: q.totalCents / 100 });
 });
 app.post('/api/checkout/sessions', requireUser, asyncRoute(async (req, res) => {
@@ -156,7 +108,7 @@ app.post('/api/checkout/sessions', requireUser, asyncRoute(async (req, res) => {
   }
   const address = validateAddress(req.body?.address);
   const result = transaction(() => {
-    const q = quote(req.body), id = randomUUID(), created = now();
+    const q = quote(req.body, findProduct), id = randomUUID(), created = now();
     const expires = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
     for (const item of q.items) {
       const changed = db.prepare('UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?').run(item.quantity, item.product_id, item.quantity);
@@ -213,6 +165,7 @@ app.post('/api/orders/:id/reconcile', requireUser, asyncRoute(async (req, res) =
   if (!await reconcilePayment(paymentId)) throw new HttpError(409, 'Pagamento não corresponde ao pedido.');
   res.json(getOrder(order.id));
 }));
+app.get('/api/reports/sales', requireUser, requireAdmin, (req, res) => res.json(salesReport(db, { from: req.query.from, to: req.query.to })));
 app.post('/api/webhooks/mercado-pago', asyncRoute(async (req, res) => {
   if (!verifyWebhook(req.headers, req.query)) return res.status(401).end();
   if (req.query.type !== 'payment') return res.status(200).end();

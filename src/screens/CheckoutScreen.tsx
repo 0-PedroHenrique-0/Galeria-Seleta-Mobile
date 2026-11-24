@@ -8,7 +8,7 @@ import { createCheckout, quoteApi } from '../api';
 import { Address, CartItem } from '../types';
 import { theme } from '../theme';
 
-const money = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+import { money } from '../cart';
 const newKey = () => `checkout-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
 
 export function CheckoutScreen({ navigation }: any) {
@@ -89,7 +89,7 @@ function Option({ label, value, selected, onPress }: { label: string; value: str
   </Pressable>;
 }
 function Row({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
-  return <View style={styles.row}><Text style={[styles.muted, strong && styles.strong]}>{label}</Text><Text style={[styles.muted, strong && styles.total]}>{value}</Text></View>;
+  return <View style={styles.row}><Text style={[styles.muted, strong && styles.strong]}>{label}</Text><Text testID={strong ? 'checkout-total' : undefined} style={[styles.muted, strong && styles.total]}>{value}</Text></View>;
 }
 const styles = StyleSheet.create({
   page: { padding: 20 }, kicker: { color: theme.colors.accent, fontSize: 10, fontWeight: '900', letterSpacing: 1.4 },

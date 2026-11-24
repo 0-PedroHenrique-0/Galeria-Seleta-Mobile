@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { Screen } from '../components/Screen';
@@ -7,7 +7,10 @@ import { Button } from '../components/Button';
 import { Field } from '../components/Field';
 import { CATEGORIES } from '../data';
 import { createProduct, deleteProduct, getProducts, ProductInput, updateProduct } from '../database';
+import { getSalesReportApi } from '../api';
+import { exportSalesReport } from '../reportExport';
 import { Product } from '../types';
+import { money } from '../cart';
 import { theme } from '../theme';
 
 const EMPTY_FORM = {
@@ -20,12 +23,26 @@ const EMPTY_FORM = {
   categoryId: CATEGORIES[0].id,
 };
 
+// Alert.alert não faz nada na web (react-native-web); lá a confirmação é o window.confirm.
+export function confirmar(titulo: string, mensagem: string): Promise<boolean> {
+  if (Platform.OS === 'web') return Promise.resolve(window.confirm(mensagem));
+  return new Promise(resolve => {
+    Alert.alert(titulo, mensagem, [
+      { text: 'Cancelar', style: 'cancel', onPress: () => resolve(false) },
+      { text: 'Excluir', style: 'destructive', onPress: () => resolve(true) },
+    ], { cancelable: true, onDismiss: () => resolve(false) });
+  });
+}
+
 export function ProductAdminScreen({ navigation }: any) {
   const [products, setProducts] = useState<Product[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState('');
+  const [exportedFile, setExportedFile] = useState('');
 
   const load = useCallback(async () => {
     try { setProducts(await getProducts()); }
@@ -112,23 +129,25 @@ export function ProductAdminScreen({ navigation }: any) {
     }
   }
 
-  function remove(product: Product) {
-    Alert.alert(
-      'Excluir produto',
-      `Deseja excluir “${product.name}”?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: async () => {
-            await deleteProduct(product.id);
-            if (editingId === product.id) clearForm();
-            await load();
-          },
-        },
-      ],
-    );
+  async function exportData() {
+    setExporting(true);
+    setExportError('');
+    setExportedFile('');
+    try {
+      setExportedFile(await exportSalesReport(await getSalesReportApi()));
+    } catch (e) {
+      setExportError(e instanceof Error ? e.message : 'Não foi possível exportar os dados.');
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  async function remove(product: Product) {
+    const confirmado = await confirmar('Excluir produto', `Deseja excluir “${product.name}”?`);
+    if (!confirmado) return;
+    await deleteProduct(product.id);
+    if (editingId === product.id) clearForm();
+    await load();
   }
 
   return (
@@ -182,6 +201,14 @@ export function ProductAdminScreen({ navigation }: any) {
           </View>
         </View>
 
+        <View style={styles.exportCard}>
+          <Text style={styles.sectionTitle}>DADOS DE VENDAS</Text>
+          <Text style={styles.exportHint}>Gera um arquivo JSON com o resumo das vendas, para o dashboard.</Text>
+          {exportError ? <Text style={styles.error}>{exportError}</Text> : null}
+          {exportedFile ? <Text style={styles.exportDone}>Arquivo gerado: {exportedFile}{Platform.OS === 'web' ? '' : ' (salvo na pasta de documentos do app)'}</Text> : null}
+          {exporting ? <Text style={styles.exportHint}>Gerando arquivo...</Text> : <Button label="EXPORTAR DADOS (JSON)" secondary onPress={exportData} />}
+        </View>
+
         <View style={styles.listHeader}>
           <Text style={styles.sectionTitle}>PRODUTOS CADASTRADOS</Text>
           <Text style={styles.count}>{products.length} item{products.length === 1 ? '' : 's'}</Text>
@@ -189,16 +216,16 @@ export function ProductAdminScreen({ navigation }: any) {
 
         <View style={styles.list}>
           {products.map(product => (
-            <View key={product.id} style={styles.productRow}>
+            <View key={product.id} testID="produto-linha" style={styles.productRow}>
               <View style={styles.productInfo}>
                 <Text style={styles.productName}>{product.name}</Text>
                 <Text style={styles.productMeta}>{product.category} · estoque {product.stock}</Text>
-                <Text style={styles.productPrice}>{product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
+                <Text style={styles.productPrice}>{money(product.price)}</Text>
               </View>
-              <Pressable onPress={() => edit(product)} style={styles.iconButton} hitSlop={8}>
+              <Pressable testID="produto-editar" onPress={() => edit(product)} style={styles.iconButton} hitSlop={8}>
                 <Ionicons name="create-outline" size={20} color={theme.colors.text} />
               </Pressable>
-              <Pressable onPress={() => remove(product)} style={styles.iconButton} hitSlop={8}>
+              <Pressable testID="produto-excluir" onPress={() => remove(product)} style={styles.iconButton} hitSlop={8}>
                 <Ionicons name="trash-outline" size={20} color={theme.colors.error} />
               </Pressable>
             </View>
@@ -227,6 +254,9 @@ const styles = StyleSheet.create({
   column: { flex: 1 },
   actions: { gap: 8 },
   error: { color: theme.colors.error, fontSize: 11, marginBottom: 14 },
+  exportCard: { backgroundColor: theme.colors.surface, borderRadius: 9, padding: 16, marginTop: 16, gap: 10 },
+  exportHint: { color: theme.colors.muted, fontSize: 11 },
+  exportDone: { color: theme.colors.text, fontSize: 11 },
   listHeader: { marginTop: 28, marginBottom: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   count: { color: theme.colors.muted, fontSize: 10 },
   list: { gap: 9 },

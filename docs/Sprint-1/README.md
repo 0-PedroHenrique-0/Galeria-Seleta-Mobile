@@ -2,16 +2,11 @@
 
 Este diretório reúne as evidências técnicas do item 1.5 da Sprint 1 do PI IV.
 
-## Banco de dados mobile local
+## Onde ficam os dados
 
-O aplicativo utiliza `expo-sqlite` e inicializa o banco `galeria-seleta.db` no início da aplicação. As tabelas criadas são:
+O catálogo vem da API (`/backend`), que guarda os dados em SQLite (`node:sqlite`). O aplicativo não tem banco local: o `AsyncStorage` guarda apenas carrinho, endereços e sessão.
 
-- `users`
-- `services`
-- `appointments`
-- `products`
-
-A tabela `products` é alimentada inicialmente pelos produtos mock já existentes no projeto.
+> Registro histórico: na Sprint 1 o catálogo vivia em um SQLite dentro do aplicativo (`expo-sqlite`, banco `galeria-seleta.db`). Isso mudou na Sprint 2, quando o aplicativo passou a consumir a API.
 
 ## CRUD de produtos
 
@@ -22,13 +17,13 @@ A tela **Gerenciar produtos**, acessível pelo Perfil, permite:
 - alterar produto;
 - excluir produto.
 
-Isso mantém o cadastro solicitado no projeto integrado ao banco local.
+Pelo aplicativo, as operações passam pela API; criar, alterar e excluir exigem conta de administrador.
 
 ## API Node
 
-O diretório `/backend` contém a configuração inicial da API Node/Express e endpoints REST para o CRUD de produtos. Nesta Sprint, a API fica configurada e pronta para evolução e integração com o aplicativo.
+O diretório `/backend` contém a API Node/Express usada pelo aplicativo: catálogo e CRUD de produtos, contas, pedidos, Checkout Pro do Mercado Pago e o relatório de vendas (veja `backend/README.md`).
 
 ## Script SQL e DER
 
-- `database/schema.sql`: criação das tabelas principais.
+- `database/schema.sql`: as seis tabelas do banco da API (referência documental; o banco é criado por `backend/src/db.js`).
 - `docs/Sprint-1/DER.md`: Diagrama Entidade-Relacionamento e descrição dos relacionamentos.
