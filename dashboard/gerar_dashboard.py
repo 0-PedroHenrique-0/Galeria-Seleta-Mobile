@@ -101,7 +101,12 @@ def grafico_faturamento_por_dia(eixo, por_dia):
     eixo.plot(tabela["data"], tabela["faturamento"], color=ACENTO,
               marker="o", markersize=4, linewidth=2)
     eixo.fill_between(tabela["data"], tabela["faturamento"], color=ACENTO, alpha=0.15)
-    eixo.xaxis.set_major_locator(mdates.AutoDateLocator(maxticks=6))
+    # Marca só os dias que existem nos dados, no máximo seis. Deixar o matplotlib
+    # escolher sozinho faz ele dividir o intervalo em horas quando há poucos dias,
+    # e o rótulo "%d/%m" acaba repetindo a mesma data.
+    datas = list(tabela["data"])
+    passo = (len(datas) + 5) // 6
+    eixo.set_xticks(datas[::passo])
     eixo.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
     eixo.set_ylabel("R$", color=TEXTO_SECUNDARIO)
     eixo.grid(axis="y", color=TEXTO_SECUNDARIO, alpha=0.25)
