@@ -25,10 +25,14 @@ Aplicativo mobile em **React Native + Expo + TypeScript**, desenvolvido para o P
 
 ## Como executar o aplicativo
 
+Use Node.js 22.13 ou superior na linha 22 LTS e o Expo Go compatível com **SDK 58**. O projeto usa Expo SDK 58, React Native 0.88 e React 19.3.
+
 ```bash
 npm install
 npx expo start
 ```
+
+Após atualizar as dependências, reinicie o Expo com `npx expo start --clear`. No iPhone, leia o QR code com a câmera e abra no Expo Go; o celular e o computador devem estar na mesma rede Wi-Fi.
 
 Depois escolha Android ou iOS pelo Expo CLI. Inicie também a API e defina `EXPO_PUBLIC_API_URL` quando o endereço padrão não for acessível pelo aparelho.
 
