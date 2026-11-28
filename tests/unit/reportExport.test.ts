@@ -53,6 +53,22 @@ test('no dispositivo sem compartilhamento ainda grava e devolve o nome', async (
   expect(Sharing.shareAsync).not.toHaveBeenCalled();
 });
 
+test('aguarda a gravação do arquivo antes de abrir o compartilhamento', async () => {
+  Object.defineProperty(Platform, 'OS', { value: 'ios', configurable: true });
+  let finishWrite!: () => void;
+  mockWrite.mockReturnValueOnce(new Promise<void>(resolve => { finishWrite = resolve; }));
+  const exporting = exportSalesReport(report);
+  try {
+    await Promise.resolve();
+    expect(Sharing.isAvailableAsync).not.toHaveBeenCalled();
+    expect(Sharing.shareAsync).not.toHaveBeenCalled();
+  } finally {
+    finishWrite();
+    await exporting;
+  }
+  expect(Sharing.shareAsync).toHaveBeenCalledTimes(1);
+});
+
 test('na web dispara o download com o nome esperado', async () => {
   Object.defineProperty(Platform, 'OS', { value: 'web', configurable: true });
   const anchor = { href: '', download: '', click: jest.fn(), remove: jest.fn() };

@@ -29,7 +29,7 @@ export async function exportSalesReport(report: SalesReport): Promise<string> {
 
   const file = new File(Paths.document, fileName);
   file.create({ overwrite: true });
-  file.write(content);
+  await file.write(content);
   if (await Sharing.isAvailableAsync()) {
     await Sharing.shareAsync(file.uri, { mimeType: MIME, dialogTitle: 'Exportar dados de vendas', UTI: 'public.json' });
   }
